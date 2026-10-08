@@ -1,0 +1,1887 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stash</title>
+<meta name="description" content="Launch a coin on pump.fun and link it to a brand. Trading fees pay holders, who redeem them as that brand's gift card.">
+<meta property="og:title" content="Stash">
+<meta property="og:description" content="Launch a coin and link it to a brand. Holders earn the fees and redeem them as a gift card.">
+<meta property="og:image" content="og.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0c0b0a">
+<link rel="icon" href="pfp.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* layout: LOOT's app shell (sticky bar, 1040px column, card grids) reskinned as warm ink with a marigold accent */
+:root{
+  --bg:#0c0b0a; --bg-2:#110f0e; --card:#161412; --card-2:#1d1a17; --card-3:#25211d;
+  --line:rgba(255,236,214,.08); --line-2:rgba(255,236,214,.15);
+  --text:#f4efe8; --muted:#a39a90; --faint:#6f675f;
+  --accent:#f5b83d; --accent-2:#e3951b; --accent-ink:#1d1305; --accent-soft:rgba(245,184,61,.14);
+  --good:#5fd394; --bad:#ff7466;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"Geist Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --r-xl:24px; --r-lg:18px; --r-md:13px; --r-sm:9px;
+  --gut:clamp(16px,3vw,24px);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font:400 15px/1.5 var(--body);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  background:radial-gradient(1100px 480px at 22% -140px,rgba(245,184,61,.11),transparent 70%),radial-gradient(900px 500px at 105% 10%,rgba(227,149,27,.05),transparent 70%),var(--bg);background-attachment:fixed}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+img{max-width:100%;display:block}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+::selection{background:rgba(245,184,61,.35)}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:var(--gut)}
+.mono{font-family:var(--mono);font-feature-settings:"zero" 1}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .faint{color:var(--faint)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- top bar ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:rgba(12,11,10,.78);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:10px;height:62px}
+.logo{display:flex;align-items:center;gap:10px;font:700 19px/1 var(--display);letter-spacing:-.02em}
+.mark{width:32px;height:32px;border-radius:10px;background:linear-gradient(160deg,#f8c75a,#e89d22);display:grid;place-items:center;box-shadow:0 6px 18px -8px rgba(245,184,61,.7),inset 0 1px 0 rgba(255,255,255,.35)}
+.mark svg{width:20px;height:20px}
+.nav{display:flex;gap:4px;margin-left:14px}
+.nav a{padding:7px 12px;border-radius:999px;color:var(--muted);font-weight:500;font-size:14px;transition:color .15s,background .15s}
+.nav a:hover{color:var(--text)}
+.nav a.on{background:var(--card-2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}
+.spacer{flex:1}
+.search{position:relative;width:min(300px,30vw)}
+.search input{width:100%;height:38px;border-radius:999px;border:1px solid var(--line);background:var(--card);padding:0 14px 0 36px;font-size:14px;outline:none;transition:border-color .15s}
+.search input:focus{border-color:var(--line-2)}
+.search svg{position:absolute;left:13px;top:11px;color:var(--faint)}
+.results{position:absolute;top:46px;left:0;right:0;background:var(--card);border:1px solid var(--line-2);border-radius:var(--r-md);padding:6px;box-shadow:0 20px 40px -12px rgba(0,0,0,.6);max-height:70vh;overflow:auto}
+.results h6{margin:8px 10px 4px;font:600 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.results a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;font-size:14px}
+.results a:hover,.results a.hl{background:var(--card-2)}
+.results .empty{padding:10px;color:var(--muted);font-size:14px}
+.iconbtn.menu-btn{display:none}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:38px;padding:0 16px;border-radius:999px;border:1px solid var(--line-2);background:var(--card-2);font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap;transition:transform .12s,background .15s,border-color .15s,opacity .15s}
+.btn:hover{background:var(--card-3)}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:linear-gradient(180deg,#f8c45a,#ea9f24);border-color:rgba(255,214,140,.5);color:var(--accent-ink);box-shadow:0 8px 22px -12px rgba(245,184,61,.9),inset 0 1px 0 rgba(255,255,255,.4)}
+.btn.pri:hover{background:linear-gradient(180deg,#fbcd6a,#efa82f)}
+.btn.lg{height:46px;padding:0 22px;font-size:15px}
+.btn.block{width:100%}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--text);background:var(--card-2)}
+.btn.sm{height:30px;padding:0 12px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.iconbtn{width:30px;height:30px;border-radius:999px;border:1px solid var(--line);background:var(--card-2);display:inline-grid;place-items:center;cursor:pointer;color:var(--muted)}
+.iconbtn:hover{color:var(--text);border-color:var(--line-2)}
+.iconbtn[disabled]{opacity:.35;cursor:not-allowed}
+.walletbtn .av{width:20px;height:20px;border-radius:6px;overflow:hidden}
+.walletbtn .wicon{display:none}
+
+/* ---------- surfaces ---------- */
+.card{background:linear-gradient(180deg,var(--card),var(--bg-2));border:1px solid var(--line);border-radius:var(--r-xl);position:relative}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg)}
+.chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap}
+.chip:hover{color:var(--text);border-color:var(--line-2)}
+.chip.on{background:linear-gradient(180deg,#f8c45a,#ea9f24);color:var(--accent-ink);border-color:transparent}
+.tag{display:inline-flex;align-items:center;gap:5px;height:22px;white-space:nowrap;padding:0 8px;border-radius:999px;background:rgba(10,9,8,.72);border:1px solid rgba(255,255,255,.08);font-size:11.5px;font-weight:600;color:#ece5dc;backdrop-filter:blur(6px)}
+.tag svg.i{width:12px;height:12px}
+.tag.sample{background:rgba(245,184,61,.16);border-color:rgba(245,184,61,.35);color:var(--accent)}
+.seg{display:inline-flex;gap:4px;padding:3px;border-radius:999px;background:var(--bg-2);border:1px solid var(--line)}
+.seg button{border:0;background:transparent;height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--accent);color:var(--accent-ink)}
+.seg.big{padding:4px;width:100%}
+.seg.big button{flex:1;height:38px;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.seg.big button.on{background:var(--card-3);color:var(--text);box-shadow:inset 0 0 0 1px var(--line-2)}
+
+/* ---------- notice ---------- */
+.notice{border-bottom:1px solid var(--line);background:rgba(245,184,61,.07);font-size:13.5px;color:#e9d9bd}
+.notice .wrap{padding-block:9px}
+.notice b{margin-right:6px}
+.notice b{color:var(--accent);font-weight:600}
+
+/* ---------- hero ---------- */
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-block:44px 26px;flex-wrap:wrap}
+.hero h1{margin:0 0 14px;font:800 clamp(38px,5.6vw,56px)/1.02 var(--display);letter-spacing:-.035em}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p{margin:0;max-width:560px;color:var(--muted);font-size:15.5px}
+.pump{display:inline-flex;align-items:center;gap:6px;vertical-align:-2px;padding:1px 9px 1px 6px;border-radius:999px;background:var(--card-2);border:1px solid var(--line);color:var(--text);font-weight:600;font-size:13.5px}
+.pump i{width:14px;height:14px;border-radius:999px;background:linear-gradient(135deg,#7fe3a1 50%,#f4efe8 50%);transform:rotate(-35deg);display:inline-block}
+.hero .acts{display:flex;gap:10px}
+
+/* ---------- stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.stat{padding:16px 16px 0;overflow:hidden;min-width:0}
+.stat .hd{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.stat .lbl{display:flex;gap:7px;align-items:center;font-size:13.5px;font-weight:500}
+.stat .lbl svg{color:var(--muted)}
+.stat .sub{font-size:12px;color:var(--faint);margin-top:2px}
+.stat .val{font:700 30px/1 var(--display);letter-spacing:-.02em;margin:16px 0 2px}
+.spark{display:block;width:100%;height:96px}
+.spark .ln{fill:none;stroke:var(--accent);stroke-width:2;vector-effect:non-scaling-stroke}
+
+/* ---------- coin grid ---------- */
+.sect{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;padding-block:30px 12px}
+.bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.bar h2{margin:0;font:700 22px/1 var(--display);letter-spacing:-.02em}
+.dd{position:relative}
+.dd>button{display:inline-flex;align-items:center;gap:4px;background:none;border:0;font:700 22px/1 var(--display);letter-spacing:-.02em;cursor:pointer;padding:4px 2px}
+.dd>button svg{color:var(--muted)}
+.dd .menu{position:absolute;top:36px;left:0;z-index:20;min-width:160px;background:var(--card);border:1px solid var(--line-2);border-radius:var(--r-md);padding:5px;box-shadow:0 20px 40px -12px rgba(0,0,0,.6)}
+.dd .menu button{display:flex;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;font-size:14px;cursor:pointer;color:var(--muted)}
+.dd .menu button:hover,.dd .menu button.on{background:var(--card-2);color:var(--text)}
+.chips{display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-width:0}
+.pager{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:13px;color:var(--muted)}
+.coins{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.coin{display:block;border-radius:var(--r-md);overflow:hidden;background:var(--card);border:1px solid var(--line);transition:transform .15s,border-color .15s}
+.coin:hover{transform:translateY(-2px);border-color:var(--line-2)}
+.coin .img{position:relative;aspect-ratio:3/2;background:var(--card-2)}
+.coin .img img{width:100%;height:100%;object-fit:cover}
+.coin .img .tags{position:absolute;left:7px;right:7px;top:7px;display:flex;justify-content:space-between;gap:4px}
+.coin .bd{padding:9px 10px 10px}
+.coin .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.coin .nm{font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.coin .nm span{color:var(--faint);font-weight:500;margin-left:4px}
+.coin .mc{font-weight:600;font-size:13.5px}
+.coin .br{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px;color:var(--muted)}
+.coin.pin{border-color:rgba(245,184,61,.45);box-shadow:0 0 0 1px rgba(245,184,61,.15),0 14px 30px -18px rgba(245,184,61,.6)}
+.dot{width:12px;height:12px;border-radius:4px;flex:none;display:inline-block;background:var(--tint,#888)}
+.empty-box{border:1px dashed var(--line-2);border-radius:var(--r-lg);padding:34px 20px;text-align:center;color:var(--muted)}
+.empty-box h3{margin:0 0 6px;color:var(--text);font:600 17px/1.3 var(--display)}
+.empty-box p{margin:0 auto 16px;max-width:420px;font-size:14px}
+
+/* ---------- brand tiles ---------- */
+.tile{position:relative;border-radius:var(--r-md);overflow:hidden;aspect-ratio:16/10;display:grid;place-items:center;background:
+  radial-gradient(120% 90% at 20% 0%,color-mix(in srgb,var(--tint) 34%,transparent),transparent 60%),
+  linear-gradient(160deg,color-mix(in srgb,var(--tint) 30%,#16120f),color-mix(in srgb,var(--tint) 12%,#0f0d0c));
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--tint) 30%,transparent)}
+.tile::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px)}
+.tile span{position:relative;z-index:1;font:800 clamp(18px,2.6vw,30px)/1 var(--display);letter-spacing:-.03em;color:color-mix(in srgb,var(--tint) 30%,#fff);text-align:center;padding:0 12px}
+.tile.sm{aspect-ratio:auto;width:42px;height:28px;border-radius:7px}
+.tile.sm span{font-size:9px;padding:0 2px;letter-spacing:0}
+.tile.sm::after{display:none}
+.cat-Games{--tint:#7383f5}.cat-Shopping{--tint:#f2845f}.cat-Food{--tint:#e8b24a}.cat-Entertainment{--tint:#e0628f}.cat-Home{--tint:#62ad84}
+.cat-Apparel{--tint:#9b84ec}.cat-Beauty{--tint:#eb93b4}.cat-Health{--tint:#4fb7c4}.cat-Travel{--tint:#4d93df}.cat-Groceries{--tint:#97b956}
+.topbrand{display:block;padding:10px;border-radius:var(--r-lg)}
+.topbrand .tile{aspect-ratio:4/3}
+.topbrand h4{margin:12px 4px 0;font:600 16px/1.2 var(--body)}
+.topbrand .cat{margin:2px 4px 0;font-size:12.5px;color:var(--faint)}
+.topbrand .n{margin:10px 4px 4px;font-size:13px;color:var(--muted)}
+.topbrand .n b{color:var(--text)}
+.brands{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.bcard{display:block;padding:8px;border-radius:var(--r-lg);background:var(--card);border:1px solid var(--line);transition:border-color .15s,transform .15s}
+.bcard:hover{border-color:var(--line-2);transform:translateY(-2px)}
+.bcard h4{margin:10px 4px 0;font-weight:600;font-size:14.5px}
+.bcard p{margin:1px 4px 4px;font-size:12px;color:var(--faint)}
+.bcard .meta{display:flex;justify-content:space-between;margin:6px 4px 2px;font-size:12px;color:var(--muted)}
+
+/* ---------- page heads ---------- */
+.ph{padding-block:34px 18px}
+.ph h1{margin:0 0 6px;font:800 32px/1.05 var(--display);letter-spacing:-.03em}
+.ph p{margin:0;color:var(--muted);max-width:620px}
+.back{display:inline-flex;align-items:center;gap:6px;margin:24px 0 16px;height:30px;padding:0 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.back:hover{color:var(--text)}
+
+/* ---------- forms ---------- */
+.field{display:grid;gap:7px;min-width:0}
+.field>label,.flabel{font-size:13.5px;font-weight:500;color:#ddd5cb}
+.inp{width:100%;height:44px;border-radius:var(--r-md);border:1px solid var(--line);background:var(--bg-2);padding:0 13px;outline:none;transition:border-color .15s,background .15s;font-size:14.5px}
+.inp:focus{border-color:rgba(245,184,61,.55);background:#141210}
+textarea.inp{height:96px;padding:11px 13px;resize:vertical;line-height:1.45}
+.inp::placeholder{color:#5f5850}
+.hint{font-size:12.5px;color:var(--faint)}
+.err{font-size:12.5px;color:var(--bad)}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.suffix{position:relative}
+.suffix .inp{padding-right:78px}
+.suffix span{position:absolute;right:12px;top:0;height:44px;display:flex;align-items:center;gap:6px;font-weight:600;font-size:14px}
+.solmark{width:16px;height:16px;border-radius:5px;background:linear-gradient(180deg,#9b8cff 0 33%,#5fd3c4 33% 66%,#c87bff 66%);display:inline-block}
+.pick{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px;border-radius:var(--r-md);border:1px dashed var(--line-2);background:var(--bg-2);cursor:pointer}
+.pick:hover{border-color:rgba(245,184,61,.5)}
+.pick .ph-img{width:40px;height:40px;border-radius:10px;background:var(--card-2);display:grid;place-items:center;color:var(--muted);overflow:hidden;flex:none}
+.pick .ph-img img{width:100%;height:100%;object-fit:cover}
+.select{position:relative}
+.select>button{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:7px 12px 7px 8px;border-radius:var(--r-md);border:1px solid var(--line);background:var(--bg-2);cursor:pointer;text-align:left}
+.select>button .tx{flex:1;min-width:0}
+.select>button .tx b{display:block;font-weight:600;font-size:14px}
+.select>button .tx small{color:var(--faint);font-size:12px}
+.select .list{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:var(--card);border:1px solid var(--line-2);border-radius:var(--r-md);box-shadow:0 22px 44px -14px rgba(0,0,0,.7);padding:6px;max-height:330px;overflow:auto}
+.select .list input{margin-bottom:6px;height:38px}
+.select .list button{display:flex;align-items:center;gap:10px;width:100%;padding:7px 8px;border-radius:9px;border:0;background:none;cursor:pointer;text-align:left;font-size:14px}
+.select .list button:hover,.select .list button.on{background:var(--card-2)}
+.select .list small{color:var(--faint);margin-left:auto;font-size:12px}
+
+/* ---------- launch ---------- */
+.launch{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin:34px auto 20px;max-width:880px;overflow:hidden}
+.launch .l{padding:24px;display:grid;gap:16px;align-content:start}
+.launch .r{padding:24px;display:grid;gap:14px;align-content:start;border-left:1px solid var(--line);background:rgba(0,0,0,.12)}
+.launch h1{margin:0;display:flex;align-items:center;gap:10px;font:800 26px/1 var(--display);letter-spacing:-.03em}
+.ytok{display:flex;align-items:center;gap:12px}
+.ytok .av{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font:700 18px/1 var(--display);background:linear-gradient(160deg,#4b6b3d,#2e4528);overflow:hidden}
+.ytok .av img{width:100%;height:100%;object-fit:cover}
+.ytok b{display:block;font-weight:600}
+.ytok small{color:var(--faint)}
+.adv{display:flex;width:100%;align-items:center;justify-content:space-between;background:none;border:0;padding:4px 0;cursor:pointer;color:#ddd5cb;font-size:13.5px;font-weight:500}
+.adv span{color:var(--faint);display:inline-flex;align-items:center;gap:4px}
+.floors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.floors button{border:1px solid var(--line);background:var(--bg-2);border-radius:10px;padding:8px 6px;cursor:pointer;text-align:center}
+.floors button b{display:block;font-size:14px}
+.floors button small{color:var(--faint);font-size:11.5px}
+.floors button.on{border-color:rgba(245,184,61,.6);background:var(--accent-soft)}
+
+/* ---------- steps (launch progress) ---------- */
+.steps{display:grid;gap:4px;margin:6px 0 4px}
+.step{display:flex;align-items:center;gap:10px;padding:8px 4px;font-size:14px;color:var(--faint)}
+.step .s{width:22px;height:22px;border-radius:999px;border:1.5px solid var(--line-2);display:grid;place-items:center;flex:none}
+.step.run{color:var(--text)} .step.run .s{border-color:var(--accent);border-top-color:transparent;animation:spin .8s linear infinite}
+.step.ok{color:var(--muted)} .step.ok .s{background:var(--good);border-color:var(--good);color:#0b1a10}
+.step.bad{color:var(--bad)} .step.bad .s{border-color:var(--bad)}
+.step.skip{opacity:.5}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- coin page ---------- */
+.cp{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;padding-block:28px 10px}
+.chead{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.chead .ci{width:52px;height:52px;border-radius:14px;overflow:hidden;background:var(--card-2);flex:none}
+.chead .ci img{width:100%;height:100%;object-fit:cover}
+.chead h1{margin:2px 0 4px;font:800 24px/1.05 var(--display);letter-spacing:-.025em}
+.chead h1 span{color:var(--faint);font-weight:600}
+.chead .by{font-size:13px;color:var(--muted)}
+.chead .rt{margin-left:auto;text-align:right;display:grid;gap:6px;justify-items:end;font-size:13px}
+.ca{display:inline-flex;align-items:center;gap:6px;color:var(--muted);cursor:pointer;background:none;border:0;padding:0}
+.ca:hover{color:var(--text)}
+.mkt{padding:18px}
+.mkt .top2{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.mkt .lb{font-size:12.5px;color:var(--faint)}
+.mkt .big{font:700 30px/1.1 var(--display);letter-spacing:-.02em}
+.mkt .kv{display:flex;gap:18px;margin:10px 0 12px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.mkt .kv b{color:var(--text);font-weight:600}
+.chart{height:300px;border-radius:var(--r-md);background:var(--bg-2);border:1px solid var(--line);position:relative;overflow:hidden}
+.chart svg{width:100%;height:100%;display:block}
+.chart .none{position:absolute;inset:0;display:grid;place-items:center;color:var(--faint);font-size:13.5px;text-align:center;padding:20px}
+.desc h5{margin:18px 0 4px;font:600 11px/1 var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+.desc p{margin:0;color:#ddd5cb;font-size:14px;white-space:pre-line;overflow-wrap:anywhere}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.side{padding:14px;display:grid;gap:14px;align-content:start}
+.bline{display:flex;align-items:center;gap:10px}
+.bline .tile{width:56px;height:38px;aspect-ratio:auto;border-radius:9px}
+.bline .tile span{font-size:10px;padding:0 3px;letter-spacing:0}
+.bline .tile::after{display:none}
+.bline b{font-weight:600;display:block}
+.bline small{color:var(--faint);font-size:12px}
+.qual{font-size:12.5px;color:var(--muted);padding-bottom:12px;border-bottom:1px solid var(--line)}
+.kpi .lb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.kpi .v{font:700 28px/1.15 var(--display);letter-spacing:-.02em;margin-top:4px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 0;border-block:1px solid var(--line)}
+.kpis .lb{font-size:12.5px;color:var(--faint)} .kpis .v{font-weight:600;font-size:15px;margin-top:2px}
+.reclist{display:grid}
+.rec{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13.5px;border-bottom:1px solid var(--line)}
+.rec:last-child{border-bottom:0}
+.rec .w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.rec .av{width:22px;height:22px;border-radius:7px;overflow:hidden;flex:none}
+.rhead{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted)}
+.countdown{font:700 28px/1.1 var(--mono);letter-spacing:-.02em}
+
+/* ---------- leaderboard ---------- */
+.podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:end}
+.pod{padding:16px;display:grid;gap:4px}
+.pod.first{padding-block:22px;border-color:rgba(245,184,61,.35);background:linear-gradient(180deg,rgba(245,184,61,.09),var(--bg-2))}
+.pod .rk{font-size:12.5px;color:var(--faint)}
+.pod .av{width:42px;height:42px;border-radius:12px;overflow:hidden;margin:6px 0}
+.pod .w{font-size:13px;color:var(--muted)}
+.pod .v{font:700 26px/1.15 var(--display);letter-spacing:-.02em;margin-top:8px}
+.meter{height:4px;border-radius:9px;background:var(--card-3);overflow:hidden;margin:6px 0 10px}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:9px}
+.pod .rd{font-size:12px;color:var(--faint);border-top:1px solid var(--line);padding-top:10px}
+.pod .rd b{display:block;color:var(--text);font-size:14px}
+.totals{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0 14px;padding-top:22px;border-top:1px solid var(--line)}
+.totals .panel{padding:16px}
+.totals .lb{font-size:13px;color:var(--muted)}
+.totals .v{font:700 26px/1.15 var(--display);margin-top:4px}
+.lrows .lr{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
+.lrows .lr:last-child{border-bottom:0}
+.lr .who{display:flex;align-items:center;gap:10px;min-width:0}
+.lr .who .av{width:24px;height:24px;border-radius:7px;overflow:hidden;flex:none}
+.lr .who .meter{flex:1;max-width:160px;margin:0}
+.lr .amt{text-align:right;color:var(--muted);white-space:nowrap}
+.lr .amt b{color:var(--text)}
+
+/* ---------- redeem ---------- */
+.redeem{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start;padding-bottom:20px}
+.redeem .card{padding:18px}
+.rtop{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+.rtop .tile{width:140px;flex:none}
+.rtop h2{margin:0 0 4px;font:800 22px/1.1 var(--display);letter-spacing:-.02em}
+.rtop p{margin:0;color:var(--muted);font-size:14px}
+.rtop .avail{margin-top:6px;font-size:13px;color:var(--faint)}
+.rtop .avail b{color:var(--text)}
+.amts{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+.amt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:14px}
+.amt:last-child{border-bottom:0}
+.amt b{font-weight:600}
+.amt small{color:var(--faint);display:inline-flex;align-items:center;gap:4px}
+.qty{margin-left:auto;display:flex;align-items:center;gap:6px}
+.qty button{width:26px;height:26px;border-radius:8px;border:1px solid var(--line);background:var(--bg-2);cursor:pointer;color:var(--muted)}
+.qty button:hover{color:var(--text)}
+.qty span{width:20px;text-align:center;font-weight:600}
+.sumline{display:flex;justify-content:space-between;align-items:center;margin:14px 0;font-size:14px;color:var(--muted)}
+.sumline b{color:var(--text)}
+.giftcards{display:grid;gap:8px}
+.gc{border:1px solid var(--line);border-radius:var(--r-md);padding:12px;background:var(--bg-2);font-size:13.5px;display:grid;gap:6px}
+.gc .code{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;background:var(--card-2);padding:7px 9px;border-radius:8px;overflow-wrap:anywhere}
+.gc .code span{flex:1;min-width:0}
+.status{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--card-3);color:var(--muted)}
+.status.done{background:rgba(95,211,148,.14);color:var(--good)}
+.status.refunded{background:rgba(255,116,102,.12);color:var(--bad)}
+.other{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:grid;gap:10px;font-size:13.5px;color:var(--muted)}
+.other .acts{display:flex;gap:8px;flex-wrap:wrap}
+.availbox{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:var(--r-md);background:var(--card);border:1px solid var(--line);max-width:360px;font-size:13px}
+.availbox .ph-t{width:44px;height:30px;border-radius:7px;background:var(--card-3)}
+.availbox b{display:block;font-size:13.5px}
+.avail-list{display:flex;gap:8px;flex-wrap:wrap}
+.availchip{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:13px}
+.availchip:hover{border-color:var(--line-2)}
+
+/* ---------- docs ---------- */
+.docs{display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px;padding-block:28px}
+.dside{position:sticky;top:86px;align-self:start;display:grid;gap:14px}
+.dside .seg{width:100%}
+.dside .seg a{flex:1;text-align:center;height:30px;line-height:30px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted)}
+.dside .seg a.on{background:var(--card-3);color:var(--text);box-shadow:inset 0 0 0 1px var(--line-2)}
+.dside .toc{display:grid;gap:2px;border-left:1px solid var(--line)}
+.dside .toc h6{margin:0 0 6px 12px;font:500 12px/1 var(--body);color:var(--faint)}
+.dside .toc a{padding:5px 12px;font-size:13.5px;color:var(--muted);border-left:2px solid transparent;margin-left:-1px}
+.dside .toc a:hover{color:var(--text)}
+.dside .toc a.on{color:var(--text);border-left-color:var(--accent)}
+.doc{max-width:700px;min-width:0}
+.doc .eyebrow{font-size:13px;color:var(--accent);font-weight:600}
+.doc h1{margin:4px 0 10px;font:800 34px/1.08 var(--display);letter-spacing:-.03em}
+.doc .lead{font-size:16px;color:var(--muted);margin:0 0 22px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.doc h2{margin:34px 0 4px;font:700 22px/1.2 var(--display);letter-spacing:-.02em;scroll-margin-top:84px}
+.doc h2+.sub{margin:0 0 14px;color:var(--faint);font-size:13.5px}
+.doc h3{margin:22px 0 6px;font:600 16px/1.3 var(--body)}
+.doc p,.doc li{color:#d9d1c7;font-size:14.5px;line-height:1.65}
+.doc ul{padding-left:20px}
+.doc code{font-family:var(--mono);font-size:12.5px;background:var(--card-2);border:1px solid var(--line);padding:1px 5px;border-radius:6px;overflow-wrap:anywhere}
+.doc strong{color:var(--text)}
+.kvt{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+.kvt td,.kvt th{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.kvt th{font-weight:600;color:var(--faint);font-size:12.5px}
+.kvt td:first-child{color:var(--muted);width:34%}
+.tablewrap{overflow-x:auto}
+.flow{padding:22px 14px;margin:14px 0;display:grid;justify-items:center;gap:0}
+.fn{min-width:150px;text-align:center;padding:10px 14px;border-radius:12px;background:var(--card-2);border:1px solid var(--line-2)}
+.fn small{display:block;font:600 10.5px/1.2 var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+.fn b{font-size:14px}
+.fn.acc small{color:var(--accent)}
+.vl{width:1px;height:20px;background:var(--line-2)}
+.fsplit{display:grid;grid-template-columns:1fr 1fr;gap:24px;position:relative;padding-top:20px}
+.fsplit::before{content:"";position:absolute;top:0;left:25%;right:25%;height:20px;border:1px solid var(--line-2);border-bottom:0;border-radius:10px 10px 0 0}
+.fsplit>div{display:grid;justify-items:center;align-content:start}
+pre.code{position:relative;margin:12px 0;background:#0f0d0c;border:1px solid var(--line);border-radius:var(--r-md);padding:38px 14px 14px;overflow-x:auto;font:400 12.5px/1.6 var(--mono);color:#e4dacd}
+pre.code .fname{position:absolute;top:0;left:0;right:0;padding:8px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--faint);display:flex;justify-content:space-between}
+pre.code .fname button{background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px}
+.kw{color:#f2b65a}.st{color:#9fd39b}.cm{color:#7d746a}
+
+/* ---------- $STASH page ---------- */
+.shead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-top:28px}
+.shead .ci{width:56px;height:56px;border-radius:16px;overflow:hidden;flex:none;background:#0c0b0a}
+.shead .ci img{width:100%;height:100%;object-fit:cover}
+.shead h1{margin:0;font:800 26px/1.05 var(--display);letter-spacing:-.025em}
+.shead h1 span{color:var(--faint);font-weight:600}
+.shead .chips{margin-top:6px}
+.sdesc{margin:14px 0 18px;color:var(--muted)}
+.burns{display:grid;gap:0}
+.burns .b{display:grid;grid-template-columns:auto auto 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.burns .b:last-child{border-bottom:0}
+
+/* ---------- modal / toast ---------- */
+.ov{position:fixed;inset:0;z-index:80;background:rgba(5,4,3,.66);backdrop-filter:blur(3px);display:grid;place-items:center;padding:16px;animation:fade .15s ease}
+.modal{width:min(440px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--card);border:1px solid var(--line-2);border-radius:var(--r-xl);padding:20px;box-shadow:0 30px 70px -20px rgba(0,0,0,.8)}
+.modal h3{margin:0 0 4px;font:700 20px/1.2 var(--display);letter-spacing:-.02em}
+.modal .mh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}
+.modal p{color:var(--muted);font-size:14px;margin:4px 0 12px}
+.wl{display:grid;gap:6px}
+.wl button{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg-2);cursor:pointer;font-weight:600;text-align:left}
+.wl button:hover{border-color:var(--line-2);background:var(--card-2)}
+.wl img{width:28px;height:28px;border-radius:8px}
+.wl small{margin-left:auto;font-weight:500;color:var(--faint);font-size:12px}
+.install{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+#toasts{position:fixed;z-index:90;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;max-width:min(380px,calc(100vw - 32px))}
+.toast{background:var(--card-2);border:1px solid var(--line-2);border-radius:14px;padding:11px 14px;font-size:14px;box-shadow:0 18px 40px -16px rgba(0,0,0,.7);animation:rise .2s ease;display:flex;gap:10px;align-items:flex-start}
+.toast.bad{border-color:rgba(255,116,102,.45)}
+.toast.ok{border-color:rgba(95,211,148,.45)}
+.toast a{color:var(--accent);text-decoration:underline}
+@keyframes fade{from{opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+.wmenu{position:absolute;right:0;top:46px;width:300px;background:var(--card);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:12px;box-shadow:0 24px 50px -16px rgba(0,0,0,.75);z-index:50}
+.wmenu .tot{font:700 26px/1.1 var(--display);margin:2px 0 10px}
+.wmenu .bl{display:grid;gap:4px;max-height:240px;overflow:auto;margin-bottom:10px}
+.wmenu .bl a{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:9px;font-size:13.5px}
+.wmenu .bl a:hover{background:var(--card-2)}
+.wmenu .bl a span{margin-left:auto;font-weight:600}
+
+/* ---------- skeleton ---------- */
+.sk{background:linear-gradient(90deg,var(--card-2),var(--card-3),var(--card-2));background-size:200% 100%;animation:sh 1.2s infinite linear;border-radius:10px}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* ---------- footer ---------- */
+footer{margin-top:60px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;gap:40px;padding-block:34px calc(34px + env(safe-area-inset-bottom,0px));flex-wrap:wrap}
+footer .about{max-width:340px;display:grid;gap:12px;color:var(--muted);font-size:13.5px}
+footer .about p{margin:0}
+footer .cols{display:flex;gap:60px}
+footer h6{margin:0 0 12px;font:500 13px/1 var(--body);color:var(--faint)}
+footer .cols a{display:block;margin-bottom:10px;font-weight:500;font-size:14px}
+footer .cols a:hover{color:var(--accent)}
+footer .fine{font-size:12px;color:var(--faint)}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  .sect{grid-template-columns:minmax(0,1fr)}
+  .coins{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .brands{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cp{grid-template-columns:minmax(0,1fr)}
+  .search{width:200px}
+}
+@media (max-width:760px){
+  .nav,.search{display:none}
+  .iconbtn.menu-btn{display:inline-grid}
+  .top .wrap{gap:8px}
+  .top.open .nav{display:flex;position:absolute;left:0;right:0;top:62px;flex-direction:column;background:var(--card);border-bottom:1px solid var(--line);padding:10px var(--gut);margin:0}
+  .top.open .search{display:block;position:absolute;left:var(--gut);right:var(--gut);top:calc(62px + 196px);width:auto}
+  .launchbtn span{display:none}
+  .stats{grid-template-columns:minmax(0,1fr)}
+  .coins{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .brands{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .launch{grid-template-columns:minmax(0,1fr)}
+  .launch .r{border-left:0;border-top:1px solid var(--line)}
+  .redeem{grid-template-columns:minmax(0,1fr)}
+  .docs{grid-template-columns:minmax(0,1fr);gap:16px}
+  .dside{position:static}
+  .dside .toc{display:none}
+  .podium{grid-template-columns:minmax(0,1fr)}
+  .pod.first{order:-1}
+  .totals{grid-template-columns:minmax(0,1fr)}
+  .chead{flex-wrap:wrap}
+  .chead .rt{margin-left:0;width:100%;display:flex;justify-content:space-between;text-align:left}
+  .rtop .tile{width:96px}
+  .hero{padding-block:30px 20px}
+  .hero .acts{width:100%}
+  .hero .acts .btn{flex:1}
+  .row2{grid-template-columns:minmax(0,1fr)}
+  .lr .who .meter{display:none}
+  footer .cols{gap:40px}
+  .wmenu{position:fixed;left:var(--gut);right:var(--gut);top:70px;width:auto}
+}
+@media (max-width:420px){
+  .walletbtn .lbl{display:none}
+  .walletbtn .wicon{display:block}
+  .walletbtn{padding:0 11px}
+  .coin .bd{padding:8px}
+  .coin .nm span{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .sk{background:var(--card-2)}
+}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="logo" href="#/" aria-label="Stash home"><span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="15" height="4.4" rx="1.6" fill="#1d1305"/><rect x="4.5" y="10" width="15" height="4.4" rx="1.6" fill="#1d1305" opacity=".78"/><rect x="6" y="15.5" width="15" height="4.4" rx="1.6" fill="#1d1305" opacity=".56"/></svg></span><span id="brandName">Stash</span></a>
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="#/" data-nav="explore">Explore</a>
+      <a href="#/brands" data-nav="brands">Brands</a>
+      <a href="#/leaderboard" data-nav="ranks">Ranks</a>
+      <a href="#/docs" data-nav="docs">Docs</a>
+    </nav>
+    <div class="spacer"></div>
+    <div class="search" id="search">
+      <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search coins or brands" autocomplete="off" aria-label="Search coins or brands">
+      <div class="results" id="results" hidden></div>
+    </div>
+    <a class="btn pri launchbtn" href="#/launch"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Launch Token</span></a>
+    <div style="position:relative">
+      <button class="btn walletbtn" id="walletBtn" type="button" aria-label="Connect wallet"><span class="lbl">Connect wallet</span></button>
+      <div class="wmenu" id="wmenu" hidden></div>
+    </div>
+    <button class="iconbtn menu-btn" id="menuBtn" type="button" aria-label="Menu"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  </div>
+</header>
+<div class="notice" id="notice" hidden><div class="wrap" id="noticeText"></div></div>
+<main id="main" class="wrap" tabindex="-1"></main>
+<footer>
+  <div class="wrap">
+    <div class="about">
+      <a class="logo" href="#/"><span class="mark" style="width:28px;height:28px;border-radius:9px"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="15" height="4.4" rx="1.6" fill="#1d1305"/><rect x="4.5" y="10" width="15" height="4.4" rx="1.6" fill="#1d1305" opacity=".78"/><rect x="6" y="15.5" width="15" height="4.4" rx="1.6" fill="#1d1305" opacity=".56"/></svg></span><span class="footName">Stash</span></a>
+      <p>Launch a coin and link it to a brand. Holders earn the fees and redeem them as a gift card.</p>
+      <p id="footX"></p>
+      <p class="fine">Brand names describe which gift card a balance redeems for. Stash is not affiliated with or endorsed by these brands. © <span id="year"></span> Stash</p>
+    </div>
+    <div class="cols">
+      <div><h6>Product</h6><a href="#/brands">Brands</a><a href="#/leaderboard">Leaderboard</a><a href="#/launch">Launch</a></div>
+      <div><h6>About</h6><a href="#/docs">Docs</a><a href="#/docs/developers">Developers</a><a href="#/stash" id="footToken">$STASH</a></div>
+    </div>
+  </div>
+</footer>
+<div id="modal"></div>
+<div id="toasts" aria-live="polite"></div>
+<script src="config.js"></script>
+<script src="brands.js"></script>
+<script src="sol.js"></script>
+<script>
+(function () {
+'use strict';
+
+/* =================================================================== setup */
+
+const CFG = Object.assign({ NAME: 'Stash', TICKER: 'STASH', CA: '', X: '', API: '', RPC: '', DEMO: false }, window.STASH_CFG || {});
+const S = window.StashSol;
+const REG = window.STASH_BRANDS || { categories: [], brands: [] };
+const API = String(CFG.API || '').replace(/\/+$/, '');
+const LAMPORTS = 1e9;
+const FLOORS = [100000, 1000000, 10000000];
+const BRANDS = new Map(REG.brands.map((b) => [b.id, b]));
+
+const st = {
+  config: null, online: false, demo: false, checked: false,
+  wallets: [], wallet: null, account: null, address: null,
+  walletInfo: null, solUsd: 0, renderId: 0, statsRange: {}, statsCache: {}
+};
+
+const $ = (s, el) => (el || document).querySelector(s);
+const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+const main = $('#main');
+
+function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem('stash:' + k)); localStorage.setItem('stash:' + k, JSON.stringify(v)); } catch (e) { return null; } return null; }
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+function short(a, n) { n = n || 4; return a ? a.slice(0, n) + '…' + a.slice(-n) : ''; }
+
+function usd(n, opts) {
+  if (n == null || !isFinite(n)) return '—';
+  const v = Number(n);
+  const a = Math.abs(v);
+  if (a >= 1000 && !(opts && opts.full)) {
+    const u = [[1e9, 'B'], [1e6, 'M'], [1e3, 'K']].find((x) => a >= x[0]);
+    const q = v / u[0];
+    return '$' + (Math.abs(q) >= 100 ? q.toFixed(0) : q.toFixed(1).replace(/\.0$/, '')) + u[1];
+  }
+  if (a > 0 && a < 0.01) return '<$0.01';
+  return '$' + v.toLocaleString('en-US', a >= 100 ? { maximumFractionDigits: 0 } : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function price(n) {
+  if (n == null || !isFinite(n) || n === 0) return '—';
+  if (n >= 1) return '$' + n.toFixed(4);
+  const s = n.toFixed(12);
+  const m = /^0\.(0*)(\d{1,4})/.exec(s);
+  return m ? '$0.' + m[1] + m[2] : '$' + n.toPrecision(4);
+}
+function sol(lamports, dp) {
+  const v = Number(lamports || 0) / LAMPORTS;
+  return v.toLocaleString('en-US', { maximumFractionDigits: dp == null ? 4 : dp }) + ' SOL';
+}
+function lamUsd(l) { return st.solUsd ? (Number(l) / LAMPORTS) * st.solUsd : null; }
+function ago(t) {
+  if (!t) return '';
+  const s = Math.max(1, Math.round((Date.now() - t) / 1000));
+  if (s < 60) return s + 's';
+  if (s < 3600) return Math.floor(s / 60) + 'm';
+  if (s < 86400) return Math.floor(s / 3600) + 'h';
+  return Math.floor(s / 86400) + 'd';
+}
+function compact(n) {
+  const v = Number(n || 0);
+  if (v >= 1e9) return (v / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'B';
+  if (v >= 1e6) return (v / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (v >= 1e3) return (v / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+  return String(Math.round(v));
+}
+
+/* ---------------------------------------------------------------- icons */
+
+const I = {
+  users: '<svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><path d="M16 5.2a3 3 0 0 1 0 5.6M17.5 14.2c1.6.6 2.7 2.2 3 4.8"/></svg>',
+  flame: '<svg class="i" viewBox="0 0 24 24"><path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.4 2.3-5.4 3.8-7.3.4 1.9 1.4 3 2.4 3.4C11.2 7.6 12.6 4.9 15.3 3c-.4 3.2 3.2 5.2 3.2 10.1C18.5 17.8 15.9 21 12 21Z"/></svg>',
+  card: '<svg class="i" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h4"/></svg>',
+  gift: '<svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="8" width="17" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8c-1.5-3.5-5.5-3.5-5.5-1 0 1.4 2.3 1 5.5 1Zm0 0c1.5-3.5 5.5-3.5 5.5-1 0 1.4-2.3 1-5.5 1Z"/></svg>',
+  chev: '<svg class="i" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>',
+  left: '<svg class="i" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg>',
+  right: '<svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>',
+  out: '<svg class="i" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg>',
+  copy: '<svg class="i" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
+  x: '<svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  img: '<svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m20 16-4.5-4.5L6 19"/></svg>',
+  check: '<svg class="i" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  clock: '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  xlogo: '<svg class="i" viewBox="0 0 24 24" style="stroke-width:0;fill:currentColor"><path d="M17.8 3h3.1l-6.8 7.7L22 21h-6.2l-4.8-6.3L5.4 21H2.3l7.2-8.3L2 3h6.3l4.4 5.8L17.8 3Zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5Z"/></svg>',
+  globe: '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.4 3.5 5.2 3.5 8.5s-1.1 6.1-3.5 8.5c-2.4-2.4-3.5-5.2-3.5-8.5S9.6 5.9 12 3.5Z"/></svg>',
+  send: '<svg class="i" viewBox="0 0 24 24"><path d="m4 11 16-7-6 17-3-7-7-3Z"/></svg>',
+  wallet: '<svg class="i wicon" viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v3"/><rect x="4" y="8" width="16" height="11" rx="2.5"/><circle cx="16" cy="13.5" r="1.2"/></svg>'
+};
+
+/* ------------------------------------------------------------- visuals */
+
+function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+
+/** 5x5 mirrored identicon for a wallet address. */
+function avatar(addr) {
+  const h = hashStr(addr || 'x');
+  const hue = h % 360;
+  const fg = 'hsl(' + hue + ' 72% 66%)', bg = 'hsl(' + ((hue + 180) % 360) + ' 22% 16%)';
+  let cells = '';
+  let bits = hashStr((addr || 'x') + 'grid');
+  for (let y = 0; y < 5; y++) for (let x = 0; x < 3; x++) {
+    if (bits & 1) { cells += '<rect x="' + x + '" y="' + y + '" width="1" height="1"/>'; if (x < 2) cells += '<rect x="' + (4 - x) + '" y="' + y + '" width="1" height="1"/>'; }
+    bits = bits >>> 1;
+  }
+  return '<svg viewBox="-1 -1 7 7" width="100%" height="100%" aria-hidden="true"><rect x="-1" y="-1" width="7" height="7" fill="' + bg + '"/><g fill="' + fg + '">' + cells + '</g></svg>';
+}
+
+/** Placeholder art for coins without an image yet. */
+function coinArt(seed, label) {
+  const h = hashStr(seed || 'coin');
+  const a = h % 360, b = (a + 40 + (h >> 8) % 80) % 360;
+  const txt = esc((label || '?').slice(0, 2).toUpperCase());
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(' + a + ',62%,52%)"/><stop offset="1" stop-color="hsl(' + b + ',58%,30%)"/></linearGradient></defs><rect width="300" height="200" fill="url(#g)"/><circle cx="' + (60 + (h % 180)) + '" cy="' + (40 + (h >> 4) % 120) + '" r="' + (50 + (h >> 12) % 60) + '" fill="rgba(255,255,255,.12)"/><text x="150" y="122" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="64" text-anchor="middle" fill="rgba(255,255,255,.92)">' + txt + '</text></svg>';
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+function coinImg(c) {
+  if (c.image && /^(https?:|data:)/.test(c.image)) return c.image;
+  return coinArt(c.mint || c.symbol, c.symbol || c.name);
+}
+
+function brandOf(id) { return BRANDS.get(id) || { id: id, name: id || 'Unknown', category: 'Shopping' }; }
+function tile(b, cls) { b = typeof b === 'string' ? brandOf(b) : b; return '<div class="tile ' + (cls || '') + ' cat-' + esc(b.category) + '"><span>' + esc(b.name) + '</span></div>'; }
+function dot(b) { b = typeof b === 'string' ? brandOf(b) : b; return '<span class="dot cat-' + esc(b.category) + '"></span>'; }
+
+/** Area sparkline from [[t, v], ...]. */
+function spark(points, h) {
+  h = h || 96;
+  const W = 300, H = h;
+  const id = 'g' + Math.random().toString(36).slice(2, 8);
+  let pts = (points || []).filter((p) => isFinite(p[1]));
+  if (pts.length < 2) { const now = Date.now(); pts = [[now - 86400000, 0], [now, (pts[0] && pts[0][1]) || 0]]; }
+  const t0 = pts[0][0], t1 = pts[pts.length - 1][0] || t0 + 1;
+  const max = Math.max.apply(null, pts.map((p) => p[1])) || 1;
+  const x = (t) => 6 + ((t - t0) / (t1 - t0 || 1)) * (W - 14);
+  const y = (v) => H - 14 - (v / max) * (H - 32);
+  const d = pts.map((p, i) => (i ? 'L' : 'M') + x(p[0]).toFixed(1) + ' ' + y(p[1]).toFixed(1)).join(' ');
+  const last = pts[pts.length - 1];
+  return '<svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5b83d" stop-opacity=".28"/><stop offset="1" stop-color="#f5b83d" stop-opacity="0"/></linearGradient></defs>' +
+    '<path d="' + d + ' L' + x(last[0]).toFixed(1) + ' ' + H + ' L' + x(pts[0][0]).toFixed(1) + ' ' + H + ' Z" fill="url(#' + id + ')"/>' +
+    '<path class="ln" d="' + d + '"/><circle cx="' + x(last[0]).toFixed(1) + '" cy="' + y(last[1]).toFixed(1) + '" r="3.6" fill="#fff4dc" stroke="#f5b83d" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>';
+}
+
+/** Candles (market cap) for the coin and $STASH charts, drawn at the box's pixel size. */
+function candleChart(raw, W, H) {
+  if (!raw || raw.length < 2) return '';
+  W = Math.max(280, Math.round(W || 720)); H = Math.max(180, Math.round(H || 300));
+  // each candle opens where the previous one closed, so moves read as bodies
+  const candles = raw.map((c, i) => ({ t: c.t, o: i ? raw[i - 1].c : c.o, h: Math.max(c.h, i ? raw[i - 1].c : c.o), l: Math.min(c.l, i ? raw[i - 1].c : c.o), c: c.c }));
+  const padR = 58, padY = 16;
+  const hi = Math.max.apply(null, candles.map((c) => c.h)), lo = Math.min.apply(null, candles.map((c) => c.l));
+  const span = hi - lo || hi * 0.02 || 1;
+  const y = (v) => padY + (1 - (v - lo) / span) * (H - padY * 2);
+  const cw = (W - padR - 10) / candles.length;
+  let g = '';
+  for (let i = 0; i <= 3; i++) {
+    const v = lo + (span * i) / 3, yy = y(v).toFixed(1);
+    g += '<line x1="0" x2="' + (W - padR) + '" y1="' + yy + '" y2="' + yy + '" stroke="rgba(255,236,214,.06)"/><text x="' + (W - padR + 8) + '" y="' + (Number(yy) + 4) + '" font-size="11" fill="#6f675f" font-family="Geist Mono,ui-monospace,monospace">' + usd(v) + '</text>';
+  }
+  candles.forEach((c, i) => {
+    const cx = 6 + i * cw + cw / 2;
+    const col = c.c >= c.o ? '#5fd394' : '#ff7466';
+    const top = y(Math.max(c.o, c.c)), bot = y(Math.min(c.o, c.c));
+    const bw = Math.max(1.5, Math.min(14, cw * 0.62));
+    g += '<line x1="' + cx.toFixed(1) + '" x2="' + cx.toFixed(1) + '" y1="' + y(c.h).toFixed(1) + '" y2="' + y(c.l).toFixed(1) + '" stroke="' + col + '"/>' +
+      '<rect x="' + (cx - bw / 2).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + Math.max(1.5, bot - top).toFixed(1) + '" fill="' + col + '" rx="1"/>';
+  });
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" aria-label="Market cap chart">' + g + '</svg>';
+}
+
+/* --------------------------------------------------------------- toasts */
+
+function toast(msg, kind, ms) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + (kind || '');
+  el.innerHTML = '<div style="flex:1">' + msg + '</div><button class="iconbtn" style="width:24px;height:24px" aria-label="Dismiss">' + I.x + '</button>';
+  $('#toasts').appendChild(el);
+  const kill = () => el.remove();
+  el.querySelector('button').onclick = kill;
+  setTimeout(kill, ms || (kind === 'bad' ? 8000 : 4500));
+}
+
+function copyText(text, label) {
+  const done = () => toast((label || 'Copied') + '', 'ok', 2000);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
+  } else fallbackCopy(text, done);
+}
+function fallbackCopy(text, done) {
+  const t = document.createElement('textarea');
+  t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+  document.body.appendChild(t); t.select();
+  try { document.execCommand('copy'); done(); } catch (e) { toast('Copy failed. Select the text instead.', 'bad'); }
+  t.remove();
+}
+
+/* ---------------------------------------------------------------- modal */
+
+function modal(html, opts) {
+  const root = $('#modal');
+  root.innerHTML = '<div class="ov" role="dialog" aria-modal="true"><div class="modal">' + html + '</div></div>';
+  const ov = root.firstChild;
+  const close = () => { root.innerHTML = ''; document.removeEventListener('keydown', onKey); if (opts && opts.onClose) opts.onClose(); };
+  const onKey = (e) => { if (e.key === 'Escape' && !(opts && opts.sticky)) close(); };
+  document.addEventListener('keydown', onKey);
+  ov.addEventListener('click', (e) => { if (e.target === ov && !(opts && opts.sticky)) close(); });
+  $$('[data-close]', ov).forEach((b) => (b.onclick = close));
+  const f = ov.querySelector('input,button:not([data-close])');
+  if (f) setTimeout(() => f.focus(), 30);
+  return { el: ov, close };
+}
+
+/* ------------------------------------------------------------------ api */
+
+async function api(path, opts) {
+  const o = opts || {};
+  const init = { method: o.method || 'GET', headers: {} };
+  if (o.body instanceof FormData) init.body = o.body;
+  else if (o.body !== undefined) { init.body = JSON.stringify(o.body); init.headers['content-type'] = 'application/json'; }
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), o.timeout || 25000);
+  init.signal = ctrl.signal;
+  let res;
+  try { res = await fetch(API + path, init); } catch (e) { throw Object.assign(new Error(e.name === 'AbortError' ? 'The server took too long to answer' : 'Could not reach the Stash server'), { offline: true }); } finally { clearTimeout(timer); }
+  let j = null;
+  try { j = await res.json(); } catch (e) { j = null; }
+  if (!res.ok) throw Object.assign(new Error((j && j.error) || 'Request failed (' + res.status + ')'), { status: res.status, body: j });
+  return j;
+}
+
+async function rpc(method, params) {
+  if (st.online) {
+    const r = await api('/api/rpc', { method: 'POST', body: { jsonrpc: '2.0', id: 1, method: method, params: params || [] } });
+    if (r.error) throw Object.assign(new Error(r.error.message || 'RPC error'), { code: r.error.code, data: r.error.data });
+    return r.result;
+  }
+  if (!CFG.RPC) throw new Error('No RPC available');
+  const res = await fetch(CFG.RPC, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params || [] }) });
+  const j = await res.json();
+  if (j.error) throw Object.assign(new Error(j.error.message), { code: j.error.code });
+  return j.result;
+}
+async function account(address) {
+  const r = await rpc('getAccountInfo', [address, { encoding: 'base64', commitment: 'confirmed' }]);
+  return r && r.value ? { owner: r.value.owner, lamports: r.value.lamports, data: S.b64decode(r.value.data[0]) } : null;
+}
+async function confirmSig(sig, timeoutMs) {
+  const start = Date.now();
+  while (Date.now() - start < (timeoutMs || 75000)) {
+    const r = await rpc('getSignatureStatuses', [[sig], { searchTransactionHistory: false }]);
+    const s = r && r.value && r.value[0];
+    if (s && s.err) throw Object.assign(new Error('The transaction failed on chain'), { chainErr: s.err });
+    if (s && (s.confirmationStatus === 'confirmed' || s.confirmationStatus === 'finalized')) return true;
+    await sleep(1400);
+  }
+  throw new Error('Not confirmed in time. Check your wallet history before trying again.');
+}
+function rpcErrorText(e) {
+  const logs = e && e.data && e.data.logs;
+  if (logs && logs.length) {
+    const last = logs.filter((l) => /Error|failed/i.test(l)).slice(-1)[0];
+    if (/insufficient lamports|insufficient funds/i.test(JSON.stringify(logs))) return 'Not enough SOL in your wallet for this.';
+    if (last) return last.replace(/^Program log: /, '').slice(0, 160);
+  }
+  if (/insufficient/i.test(e.message || '')) return 'Not enough SOL in your wallet for this.';
+  return e.message || 'Something went wrong';
+}
+
+/* -------------------------------------------------------------- startup */
+
+async function boot() {
+  $('#brandName').textContent = CFG.NAME || 'Stash';
+  $$('.footName').forEach((x) => (x.textContent = CFG.NAME || 'Stash'));
+  $('#footToken').textContent = '$' + (CFG.TICKER || 'STASH');
+  $('#year').textContent = new Date().getFullYear();
+  if (CFG.X) {
+    const handle = String(CFG.X).replace(/^https?:\/\/(x|twitter)\.com\//, '').replace(/^@/, '');
+    $('#footX').innerHTML = '<a href="https://x.com/' + esc(handle) + '" target="_blank" rel="noopener" style="display:inline-flex;gap:8px;align-items:center;color:var(--muted)">' + I.xlogo + ' @' + esc(handle) + '</a>';
+  }
+  setupWallets();
+  $('#walletBtn').innerHTML = I.wallet + '<span class="lbl">Connect wallet</span>';
+  setupSearch();
+  setupMenu();
+  document.addEventListener('click', (e) => { $$('.dd .menu').forEach((m) => { if (!m.parentElement.contains(e.target)) m.hidden = true; }); });
+  window.addEventListener('hashchange', route);
+  try {
+    st.config = await api('/api/config', { timeout: 6000 });
+    if (!st.config || typeof st.config !== 'object' || !st.config.ready) throw new Error('Not a Stash server');
+    st.online = true;
+    st.solUsd = st.config.solUsd || 0;
+    for (const b of st.config.brands || []) if (!BRANDS.has(b.id)) BRANDS.set(b.id, b);
+  } catch (e) {
+    st.online = false;
+    st.demo = !!CFG.DEMO;
+  }
+  st.checked = true;
+  notice();
+  route();
+  const last = store('wallet');
+  if (last) setTimeout(() => { const w = st.wallets.find((x) => x.name === last); if (w) connect(w, true).catch(() => {}); }, 400);
+}
+
+function notice() {
+  const n = $('#notice');
+  let msg = '';
+  if (!st.online && st.demo) msg = '<b>Preview.</b> Live data appears once the Stash server is running. Cards marked Sample are examples, and every counter starts at 0.';
+  else if (!st.online) msg = '<b>Live data isn\'t connected.</b> The Stash server didn\'t answer, so coins, balances and launching are unavailable right now.';
+  else if (st.config && st.config.provider && st.config.provider.name === 'mock') msg = '<b>Test mode.</b> Gift card codes on this server are fake.';
+  else if (st.config && st.config.provider && st.config.provider.name === 'reloadly' && !st.config.provider.live) msg = '<b>Test mode.</b> Gift cards come from the provider\'s sandbox and are not real.';
+  n.hidden = !msg;
+  $('#noticeText').innerHTML = msg;
+}
+
+/* --------------------------------------------------------------- wallet */
+
+function setupWallets() {
+  const apiObj = { register: function () { for (const w of arguments) addWallet(w); return () => {}; } };
+  window.addEventListener('wallet-standard:register-wallet', (e) => { try { e.detail(apiObj); } catch (err) { /* ignore */ } });
+  try { window.dispatchEvent(new CustomEvent('wallet-standard:app-ready', { detail: apiObj })); } catch (e) { /* ignore */ }
+  $('#walletBtn').onclick = () => (st.address ? toggleWalletMenu() : openConnect());
+  document.addEventListener('click', (e) => { const m = $('#wmenu'); if (!m.hidden && !m.contains(e.target) && e.target !== $('#walletBtn') && !$('#walletBtn').contains(e.target)) m.hidden = true; });
+}
+function addWallet(w) {
+  if (!w || !w.features || st.wallets.includes(w)) return;
+  const solana = (w.chains || []).some((c) => String(c).startsWith('solana:'));
+  if (!solana || !w.features['standard:connect'] || !w.features['solana:signTransaction']) return;
+  st.wallets.push(w);
+}
+function openConnect() {
+  const list = st.wallets.map((w, i) => '<button data-w="' + i + '"><img alt="" src="' + esc(w.icon) + '">' + esc(w.name) + '<small>Detected</small></button>').join('');
+  const m = modal('<div class="mh"><div><h3>Connect a wallet</h3><p>Stash only asks your wallet to sign. It never holds your keys.</p></div><button class="iconbtn" data-close aria-label="Close">' + I.x + '</button></div>' +
+    (list ? '<div class="wl">' + list + '</div>' : '<p>No Solana wallet found in this browser. Install one, then reload this page.</p><div class="install"><a class="btn sm" href="https://phantom.com/download" target="_blank" rel="noopener">Phantom ' + I.out + '</a><a class="btn sm" href="https://solflare.com/download" target="_blank" rel="noopener">Solflare ' + I.out + '</a><a class="btn sm" href="https://backpack.app/downloads" target="_blank" rel="noopener">Backpack ' + I.out + '</a></div>'));
+  $$('[data-w]', m.el).forEach((b) => (b.onclick = async () => {
+    try { await connect(st.wallets[Number(b.dataset.w)]); m.close(); } catch (e) { toast(esc(e.message || 'Wallet refused to connect'), 'bad'); }
+  }));
+}
+async function connect(w, silent) {
+  const res = await w.features['standard:connect'].connect(silent ? { silent: true } : undefined);
+  const acct = (res && res.accounts && res.accounts[0]) || (w.accounts && w.accounts[0]);
+  if (!acct) throw new Error('No account was shared');
+  st.wallet = w; st.account = acct; st.address = acct.address;
+  store('wallet', w.name);
+  if (w.features['standard:events']) {
+    w.features['standard:events'].on('change', (p) => {
+      if (p && p.accounts) {
+        const a = p.accounts[0];
+        if (!a) disconnect(); else { st.account = a; st.address = a.address; walletChanged(); }
+      }
+    });
+  }
+  walletChanged();
+}
+function disconnect() {
+  try { if (st.wallet && st.wallet.features['standard:disconnect']) st.wallet.features['standard:disconnect'].disconnect(); } catch (e) { /* ignore */ }
+  st.wallet = null; st.account = null; st.address = null; st.walletInfo = null;
+  store('wallet', '');
+  walletChanged();
+}
+async function walletChanged() {
+  const btn = $('#walletBtn');
+  if (!st.address) {
+    btn.innerHTML = I.wallet + '<span class="lbl">Connect wallet</span>';
+    $('#wmenu').hidden = true;
+  } else {
+    btn.innerHTML = '<span class="av">' + avatar(st.address) + '</span><span class="lbl mono">' + short(st.address) + '</span>';
+    await loadWalletInfo();
+  }
+  document.dispatchEvent(new CustomEvent('stash:wallet'));
+}
+async function loadWalletInfo() {
+  if (!st.address || !st.online) { st.walletInfo = null; return null; }
+  try { st.walletInfo = await api('/api/wallet/' + st.address); st.solUsd = st.walletInfo.solUsd || st.solUsd; } catch (e) { st.walletInfo = null; }
+  const btn = $('#walletBtn');
+  if (st.walletInfo && st.walletInfo.totalLamports > 0) btn.innerHTML = '<span class="av">' + avatar(st.address) + '</span><span class="lbl mono">' + short(st.address) + '</span><span class="num" style="color:var(--accent)">' + usd(lamUsd(st.walletInfo.totalLamports)) + '</span>';
+  return st.walletInfo;
+}
+function toggleWalletMenu() {
+  const m = $('#wmenu');
+  if (!m.hidden) { m.hidden = true; return; }
+  const info = st.walletInfo;
+  const bals = info && info.balances && info.balances.length ? info.balances.map((b) => '<a href="#/brand/' + esc(b.brand) + '">' + dot(b.brand) + esc(b.name) + '<span class="num">' + usd(lamUsd(b.lamports)) + '</span></a>').join('') : '<div class="muted" style="font-size:13px;padding:4px 2px">Nothing to redeem yet. Hold coins on Stash to start earning.</div>';
+  m.innerHTML = '<div class="muted" style="font-size:12.5px">Your stash</div><div class="tot num">' + (info ? usd(lamUsd(info.totalLamports)) : '—') + '</div><div class="bl">' + bals + '</div>' +
+    '<div style="display:flex;gap:8px"><button class="btn sm" id="wmCopy">' + I.copy + ' Copy address</button><button class="btn sm ghost" id="wmOut">Disconnect</button></div>';
+  m.hidden = false;
+  $('#wmCopy').onclick = () => copyText(st.address, 'Address copied');
+  $('#wmOut').onclick = () => { m.hidden = true; disconnect(); };
+  $$('a', m).forEach((a) => (a.onclick = () => (m.hidden = true)));
+}
+async function needWallet() {
+  if (st.address) return true;
+  openConnect();
+  return false;
+}
+async function signTxs(list) {
+  const feat = st.wallet.features['solana:signTransaction'];
+  const chain = (st.account.chains || []).find((c) => c === 'solana:mainnet') || 'solana:mainnet';
+  const out = await feat.signTransaction.apply(feat, list.map((t) => ({ account: st.account, transaction: t, chain: chain })));
+  return out.map((o) => o.signedTransaction);
+}
+async function signMessage(text) {
+  const feat = st.wallet.features['solana:signMessage'];
+  if (!feat) throw new Error('This wallet cannot sign messages. Try Phantom, Solflare or Backpack.');
+  const [res] = await feat.signMessage({ account: st.account, message: new TextEncoder().encode(text) });
+  return S.b58encode(res.signature);
+}
+/** Ask the server for a challenge, have the wallet sign it, then run the action. */
+async function signed(action, params, endpoint) {
+  const ch = await api('/api/challenge', { method: 'POST', body: { wallet: st.address, action: action, params: params } });
+  const signature = await signMessage(ch.message);
+  return api(endpoint, { method: 'POST', body: { nonce: ch.nonce, signature: signature }, timeout: 90000 });
+}
+
+/* --------------------------------------------------------------- header */
+
+function setupMenu() {
+  $('#menuBtn').onclick = () => $('#top').classList.toggle('open');
+  $$('#nav a').forEach((a) => (a.onclick = () => $('#top').classList.remove('open')));
+}
+
+function setupSearch() {
+  const q = $('#q'), box = $('#results');
+  let t = null, hl = -1;
+  const close = () => { box.hidden = true; hl = -1; };
+  q.addEventListener('input', () => { clearTimeout(t); t = setTimeout(run, 180); });
+  q.addEventListener('focus', () => { if (q.value.trim()) run(); });
+  q.addEventListener('keydown', (e) => {
+    const items = $$('a', box);
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); hl = Math.max(0, Math.min(items.length - 1, hl + (e.key === 'ArrowDown' ? 1 : -1))); items.forEach((a, i) => a.classList.toggle('hl', i === hl)); }
+    if (e.key === 'Enter' && items[hl < 0 ? 0 : hl]) { location.hash = items[hl < 0 ? 0 : hl].getAttribute('href'); q.blur(); close(); }
+    if (e.key === 'Escape') { close(); q.blur(); }
+  });
+  document.addEventListener('click', (e) => { if (!$('#search').contains(e.target)) close(); });
+  async function run() {
+    const text = q.value.trim();
+    if (!text) return close();
+    let res = { coins: [], brands: [] };
+    const lower = text.toLowerCase();
+    const brands = REG.brands.filter((b) => b.name.toLowerCase().includes(lower)).slice(0, 5);
+    if (st.online) { try { res = await api('/api/search?q=' + encodeURIComponent(text)); } catch (e) { res = { coins: [], brands: [] }; } }
+    else if (st.demo) res.coins = SAMPLE.filter((c) => (c.name + ' ' + c.symbol).toLowerCase().includes(lower)).slice(0, 5);
+    const coins = res.coins || [];
+    box.innerHTML = (coins.length ? '<h6>Coins</h6>' + coins.map((c) => '<a href="#/coin/' + esc(c.mint) + '"><img src="' + esc(coinImg(c)) + '" alt="" style="width:26px;height:26px;border-radius:7px;object-fit:cover">' + esc(c.name) + ' <span class="faint">' + esc(c.symbol) + '</span>' + (c.sample ? ' <span class="tag sample">Sample</span>' : '') + '</a>').join('') : '') +
+      (brands.length ? '<h6>Brands</h6>' + brands.map((b) => '<a href="#/brand/' + esc(b.id) + '">' + dot(b) + esc(b.name) + ' <span class="faint">' + esc(b.category) + '</span></a>').join('') : '') +
+      (!coins.length && !brands.length ? '<div class="empty">Nothing matches “' + esc(text) + '”.</div>' : '');
+    box.hidden = false;
+    hl = -1;
+    $$('a', box).forEach((a) => (a.onclick = () => { close(); q.value = ''; }));
+  }
+}
+
+/* ---------------------------------------------------------------- demo */
+
+const now0 = Date.now();
+const SAMPLE = [
+  { name: 'Steam Rollers', symbol: 'ROLL', brand: 'steam', mode: 'dividends', hue: 'steam' },
+  { name: 'Latte Stack', symbol: 'LATTE', brand: 'starbucks', mode: 'giveaway' },
+  { name: 'Night Owl', symbol: 'OWL', brand: 'netflix', mode: 'dividends' },
+  { name: 'Kick Drop', symbol: 'KICKS', brand: 'nike', mode: 'giveaway' },
+  { name: 'Grocery Run', symbol: 'RUN', brand: 'instacart', mode: 'dividends' },
+  { name: 'Weekend Away', symbol: 'AWAY', brand: 'airbnb', mode: 'dividends' },
+  { name: 'Pixel Pal', symbol: 'PIXEL', brand: 'playstation', mode: 'giveaway' },
+  { name: 'Block Party', symbol: 'BLOCK', brand: 'roblox', mode: 'dividends' }
+].map((c, i) => Object.assign(c, {
+  mint: 'Samp1e' + 'abcdefghijkmnopqrstuvwxyz123456789ABCDEFGHJ'.slice(i, i + 38), sample: true, floor: 1,
+  brandName: brandOf(c.brand).name, createdAt: now0 - (i + 2) * 3600000 * 3, mcapUsd: null, image: ''
+}));
+
+/* =============================================================== router */
+
+function route() {
+  const h = location.hash || '#/';
+  const id = ++st.renderId;
+  $('#top').classList.remove('open');
+  const m = [
+    [/^#\/?$/, viewExplore, 'explore'],
+    [/^#\/brands\/?$/, viewBrands, 'brands'],
+    [/^#\/brand\/([a-z0-9-]+)$/, viewBrand, 'brands'],
+    [/^#\/(leaderboard|ranks)$/, viewLeaderboard, 'ranks'],
+    [/^#\/docs(?:\/(developers))?(?:\/([a-z-]+))?$/, viewDocs, 'docs'],
+    [/^#\/launch$/, viewLaunch, ''],
+    [/^#\/coin\/([1-9A-HJ-NP-Za-km-z]{30,48})$/, viewCoin, ''],
+    [/^#\/stash$/, viewStash, '']
+  ].find((r) => r[0].test(h));
+  $$('#nav a').forEach((a) => a.classList.toggle('on', !!m && a.dataset.nav === m[2]));
+  if (!m) { main.innerHTML = '<div class="ph"><h1>Page not found</h1><p>That link doesn\'t lead anywhere on Stash.</p></div><a class="btn" href="#/">Back to Explore</a>'; return; }
+  const args = m[0].exec(h).slice(1);
+  window.scrollTo(0, 0);
+  Promise.resolve(m[1].apply(null, [id].concat(args))).catch((e) => {
+    if (id !== st.renderId) return;
+    main.innerHTML = '<div class="ph"><h1>Couldn\'t load this page</h1><p>' + esc(e.message) + '</p></div><button class="btn" onclick="location.reload()">Reload</button>';
+  });
+}
+const live = (id) => id === st.renderId;
+
+/* ============================================================= explore */
+
+async function viewExplore(id) {
+  const tk = esc(CFG.TICKER || 'STASH');
+  main.innerHTML =
+    '<section class="hero"><div><h1>Link a coin<br>to <em>any brand</em></h1>' +
+    '<p>Launch a token <span class="pump"><i></i>on pump.fun</span> and link it to any brand. Fees pay holders by the coin\'s payout and can be redeemed for that brand\'s gift card.</p></div>' +
+    '<div class="acts"><a class="btn pri lg" href="#/launch">Launch a token</a><a class="btn lg" href="#/docs">Read the docs</a></div></section>' +
+    '<section class="stats" id="stats">' +
+      statCard('paid', I.users, 'Paid to holders', '<span id="paidSub">0 holders paid</span>') +
+      statCard('burn', I.flame, 'Buy &amp; burn', '$' + tk + ' · 20% of fees') +
+      statCard('redeemed', I.card, 'Redeemed', 'Spent on gift cards') +
+    '</section>' +
+    '<section class="sect"><div style="min-width:0">' +
+      '<div class="bar"><div class="dd" id="sortDd"><button type="button" aria-haspopup="true"><span id="sortLbl">Top</span> ' + I.chev + '</button><div class="menu" hidden><button data-v="top" class="on">Top</button><button data-v="new">New</button></div></div>' +
+      '<div class="dd" id="modeDd"><button type="button" aria-haspopup="true"><span id="modeLbl">All</span> ' + I.chev + '</button><div class="menu" hidden><button data-v="" class="on">All</button><button data-v="dividends">Dividends</button><button data-v="giveaway">Giveaway</button></div></div>' +
+      '<div class="chips" id="bchips"></div>' +
+      '<div class="pager"><button class="iconbtn" id="pPrev" aria-label="Previous page">' + I.left + '</button><span class="num" id="pLbl">1 / 1</span><button class="iconbtn" id="pNext" aria-label="Next page">' + I.right + '</button></div></div>' +
+      '<div class="coins" id="coins">' + skelCoins(8) + '</div>' +
+    '</div><aside class="topbrands"><div class="bar"><h2>Top brands</h2><div class="pager"><button class="iconbtn" id="tbPrev" aria-label="Previous brand">' + I.left + '</button><span class="num" id="tbLbl">1 / 1</span><button class="iconbtn" id="tbNext" aria-label="Next brand">' + I.right + '</button></div></div><div id="topBrand"></div></aside></section>';
+
+  ['paid', 'burn', 'redeemed'].forEach((k) => {
+    const seg = $('#seg-' + k);
+    $$('button', seg).forEach((b) => (b.onclick = () => { $$('button', seg).forEach((x) => x.classList.toggle('on', x === b)); st.statsRange[k] = b.dataset.r; fillStat(k); }));
+  });
+  ['paid', 'burn', 'redeemed'].forEach(fillStat);
+
+  const q = { sort: 'top', mode: '', brand: '', page: 1, pages: 1 };
+  const dd = (sel, key, lbl) => {
+    const root = $(sel), menu = $('.menu', root);
+    $('button', root).onclick = (e) => { e.stopPropagation(); $$('.dd .menu').forEach((m) => { if (m !== menu) m.hidden = true; }); menu.hidden = !menu.hidden; };
+    $$('.menu button', root).forEach((b) => (b.onclick = () => { q[key] = b.dataset.v; q.page = 1; $(lbl).textContent = b.textContent; $$('.menu button', root).forEach((x) => x.classList.toggle('on', x === b)); menu.hidden = true; loadCoins(); }));
+  };
+  dd('#sortDd', 'sort', '#sortLbl'); dd('#modeDd', 'mode', '#modeLbl');
+  $('#pPrev').onclick = () => { if (q.page > 1) { q.page--; loadCoins(); } };
+  $('#pNext').onclick = () => { if (q.page < q.pages) { q.page++; loadCoins(); } };
+
+  // brand chips: brands with the most coins
+  let brandsList = (st.config && st.config.brands) || REG.brands.map((b) => Object.assign({ coins: 0 }, b));
+  if (!st.online && st.demo) brandsList = REG.brands.map((b) => Object.assign({}, b, { coins: SAMPLE.filter((c) => c.brand === b.id).length }));
+  const ranked = brandsList.slice().sort((a, b) => (b.coins || 0) - (a.coins || 0));
+  const chipBrands = ranked.filter((b) => b.coins > 0).slice(0, 3);
+  const renderChips = () => {
+    $('#bchips').innerHTML = '<button class="chip ' + (q.brand ? '' : 'on') + '" data-b="">All</button>' +
+      chipBrands.map((b) => '<button class="chip ' + (q.brand === b.id ? 'on' : '') + '" data-b="' + esc(b.id) + '">' + esc(b.name) + '</button>').join('') +
+      '<div class="dd" id="moreB"><button type="button" class="iconbtn" aria-label="More brands">' + I.chev + '</button><div class="menu" hidden style="max-height:300px;overflow:auto;left:auto;right:0">' +
+      ranked.map((b) => '<button data-b="' + esc(b.id) + '">' + esc(b.name) + (b.coins ? ' · ' + b.coins : '') + '</button>').join('') + '</div></div>';
+    $$('#bchips [data-b]').forEach((b) => (b.onclick = () => {
+      q.brand = b.dataset.b; q.page = 1;
+      if (q.brand && !chipBrands.find((x) => x.id === q.brand)) chipBrands.splice(2, 1, brandOf(q.brand));
+      renderChips(); loadCoins();
+    }));
+    const more = $('#moreB');
+    $('button', more).onclick = (e) => { e.stopPropagation(); $('.menu', more).hidden = !$('.menu', more).hidden; };
+  };
+  renderChips();
+
+  async function loadCoins() {
+    const box = $('#coins');
+    if (!box) return;
+    if (!st.online) {
+      const items = st.demo ? SAMPLE.filter((c) => (!q.brand || c.brand === q.brand) && (!q.mode || c.mode === q.mode)) : [];
+      q.pages = 1;
+      $('#pLbl').textContent = '1 / 1';
+      box.innerHTML = items.length ? stashPin(null, true) + items.map(coinCard).join('') : emptyCoins(q);
+      return;
+    }
+    box.innerHTML = skelCoins(8);
+    try {
+      const r = await api('/api/coins?sort=' + q.sort + '&mode=' + q.mode + '&brand=' + encodeURIComponent(q.brand) + '&page=' + q.page + '&size=12');
+      if (!live(id)) return;
+      q.pages = r.pages;
+      $('#pLbl').textContent = r.page + ' / ' + r.pages;
+      $('#pPrev').disabled = r.page <= 1; $('#pNext').disabled = r.page >= r.pages;
+      const pin = r.pinned ? stashPin(r.pinned) : '';
+      box.innerHTML = r.items.length || pin ? pin + r.items.map(coinCard).join('') : emptyCoins(q);
+    } catch (e) { box.innerHTML = '<div class="empty-box" style="grid-column:1/-1"><h3>Coins didn\'t load</h3><p>' + esc(e.message) + '</p></div>'; }
+  }
+  loadCoins();
+
+  // top brands carousel
+  const top = ranked.filter((b) => b.coins > 0);
+  const tops = top.length ? top : ranked.slice(0, 7);
+  let ti = 0;
+  const showTop = () => {
+    const b = tops[ti];
+    $('#tbLbl').textContent = (ti + 1) + ' / ' + tops.length;
+    $('#topBrand').innerHTML = '<a class="card topbrand" href="#/brand/' + esc(b.id) + '">' + tile(b) + '<h4>' + esc(b.name) + '</h4><div class="cat">' + esc(b.category) + '</div><div class="n"><b class="num">' + (b.coins || 0) + '</b> ' + (b.coins === 1 ? 'coin' : 'coins') + '</div></a>';
+  };
+  $('#tbPrev').onclick = () => { ti = (ti - 1 + tops.length) % tops.length; showTop(); };
+  $('#tbNext').onclick = () => { ti = (ti + 1) % tops.length; showTop(); };
+  showTop();
+}
+
+function statCard(k, icon, label, sub) {
+  return '<div class="card stat"><div class="hd"><div><div class="lbl">' + icon + label + '</div><div class="sub">' + sub + '</div></div>' +
+    '<div class="seg" id="seg-' + k + '"><button data-r="1d">1D</button><button data-r="30d">30D</button><button data-r="all" class="on">All time</button></div></div>' +
+    '<div class="val num" id="val-' + k + '">$0</div><div id="sp-' + k + '">' + spark([]) + '</div></div>';
+}
+async function fillStat(k) {
+  const range = st.statsRange[k] || 'all';
+  let data = null;
+  if (st.online) {
+    try { data = st.statsCache[range] || (st.statsCache[range] = await api('/api/stats?range=' + range)); } catch (e) { data = null; }
+  }
+  const part = data ? data[k] : { total: 0, series: [] };
+  const v = $('#val-' + k);
+  if (!v) return;
+  v.textContent = usd(part.total || 0);
+  $('#sp-' + k).innerHTML = spark(part.series || []);
+  if (k === 'paid') $('#paidSub').textContent = (data ? data.paid.holders : 0).toLocaleString('en-US') + ' holders paid';
+}
+
+function skelCoins(n) { let s = ''; for (let i = 0; i < n; i++) s += '<div class="coin"><div class="img sk"></div><div class="bd"><div class="sk" style="height:12px;width:70%"></div><div class="sk" style="height:10px;width:45%;margin-top:8px"></div></div></div>'; return s; }
+function emptyCoins(q) {
+  return '<div class="empty-box" style="grid-column:1/-1"><h3>' + (q.brand ? 'No ' + esc(brandOf(q.brand).name) + ' coins yet' : 'No coins yet') + '</h3><p>' +
+    (q.brand ? 'Be the first to launch a coin linked to ' + esc(brandOf(q.brand).name) + '.' : 'Launch the first coin. Its holders start earning from the first trade.') + '</p><a class="btn pri" href="#/launch">Launch a token</a></div>';
+}
+function modeTag(c) {
+  if (c.mode === 'burn') return '<span class="tag">' + I.flame + 'Buy &amp; burn</span>';
+  return c.mode === 'giveaway' ? '<span class="tag">' + I.gift + 'Giveaway</span>' : '<span class="tag">' + I.users + 'Dividends</span>';
+}
+function coinCard(c) {
+  return '<a class="coin" href="#/coin/' + esc(c.mint) + '"><div class="img"><img loading="lazy" alt="" src="' + esc(coinImg(c)) + '" onerror="this.src=\'' + coinArt(c.mint, c.symbol).replace(/'/g, '%27') + '\'"><div class="tags">' + modeTag(c) +
+    (c.sample ? '<span class="tag sample">Sample</span>' : '<span class="tag num">' + ago(c.createdAt) + '</span>') + '</div></div>' +
+    '<div class="bd"><div class="row"><div class="nm">' + esc(c.name) + '<span>' + esc(c.symbol) + '</span></div><div class="mc num">' + (c.mcapUsd ? usd(c.mcapUsd) : '—') + '</div></div>' +
+    '<div class="br">' + dot(c.brand) + esc(c.brandName || brandOf(c.brand).name) + '</div></div></a>';
+}
+function stashPin(p, sample) {
+  if (!CFG.CA && !sample) return '';
+  const name = esc(CFG.NAME || 'Stash'), tk = esc(CFG.TICKER || 'STASH');
+  return '<a class="coin pin" href="#/stash"><div class="img"><img alt="" src="pfp.jpg" onerror="this.src=\'' + coinArt('stash', 'ST') + '\'" style="object-fit:contain;background:#0c0b0a"><div class="tags">' + modeTag({ mode: 'burn' }) + (CFG.CA ? '' : '<span class="tag">Not live</span>') + '</div></div>' +
+    '<div class="bd"><div class="row"><div class="nm">' + name + ' Coin<span>$' + tk + '</span></div><div class="mc num">' + (p && p.mcapUsd ? usd(p.mcapUsd) : '—') + '</div></div><div class="br"><span class="dot" style="background:var(--accent)"></span>Buy &amp; burn</div></div></a>';
+}
+
+/* ============================================================== brands */
+
+async function viewBrands(id) {
+  let data = null;
+  if (st.online) { try { data = await api('/api/brands'); } catch (e) { data = null; } }
+  if (!live(id)) return;
+  const list = data ? data.brands : REG.brands.map((b) => Object.assign({ coins: st.demo ? SAMPLE.filter((c) => c.brand === b.id).length : 0 }, b));
+  const cats = (data && data.categories) || REG.categories;
+  let cat = '', page = 1;
+  const per = 12;
+  main.innerHTML = '<div class="ph"><h1>Brands</h1><p>A coin is linked to one brand. You can redeem your balance for that brand\'s gift card.</p></div>' +
+    '<div style="margin-bottom:20px"><div class="flabel" style="margin-bottom:8px">Available</div><div id="availBox"></div></div>' +
+    '<div class="bar"><div class="chips" id="cats"></div><div class="pager"><button class="iconbtn" id="bp" aria-label="Previous page">' + I.left + '</button><span class="num" id="bl">1 / 1</span><button class="iconbtn" id="bn" aria-label="Next page">' + I.right + '</button></div></div>' +
+    '<div class="brands" id="bgrid"></div>';
+  const renderAvail = () => {
+    const box = $('#availBox');
+    if (!box) return;
+    if (!st.address) { box.innerHTML = '<div class="availbox"><div class="ph-t"></div><div><b>Nothing to redeem</b><span class="muted">Connect a wallet to see what you can redeem.</span></div></div>'; return; }
+    const bals = st.walletInfo && st.walletInfo.balances;
+    if (!bals || !bals.length) { box.innerHTML = '<div class="availbox"><div class="ph-t"></div><div><b>Nothing to redeem</b><span class="muted">Hold a Stash coin to start earning a balance.</span></div></div>'; return; }
+    box.innerHTML = '<div class="avail-list">' + bals.map((b) => '<a class="availchip" href="#/brand/' + esc(b.brand) + '">' + tile(b.brand, 'sm') + '<span><b>' + esc(b.name) + '</b> <span class="num muted">' + usd(lamUsd(b.lamports)) + '</span></span></a>').join('') + '</div>';
+  };
+  renderAvail();
+  document.addEventListener('stash:wallet', function onW() { if (!live(id)) return document.removeEventListener('stash:wallet', onW); renderAvail(); });
+  const render = () => {
+    $('#cats').innerHTML = '<button class="chip ' + (cat ? '' : 'on') + '" data-c="">All</button>' + cats.map((c) => '<button class="chip ' + (cat === c ? 'on' : '') + '" data-c="' + esc(c) + '">' + esc(c) + '</button>').join('');
+    $$('#cats .chip').forEach((b) => (b.onclick = () => { cat = b.dataset.c; page = 1; render(); }));
+    const items = list.filter((b) => !cat || b.category === cat);
+    const pages = Math.max(1, Math.ceil(items.length / per));
+    page = Math.min(page, pages);
+    $('#bl').textContent = page + ' / ' + pages;
+    $('#bp').disabled = page <= 1; $('#bn').disabled = page >= pages;
+    $('#bgrid').innerHTML = items.slice((page - 1) * per, page * per).map((b) => '<a class="bcard" href="#/brand/' + esc(b.id) + '">' + tile(b) + '<h4>' + esc(b.name) + '</h4><p>' + esc(b.category) + '</p><div class="meta"><span><b class="num" style="color:var(--text)">' + (b.coins || 0) + '</b> coins</span>' + (b.cheapestUsUsd ? '<span>from ' + usd(b.cheapestUsUsd) + '</span>' : '') + '</div></a>').join('');
+  };
+  $('#bp').onclick = () => { page--; render(); };
+  $('#bn').onclick = () => { page++; render(); };
+  render();
+}
+
+/* =============================================================== brand */
+
+async function viewBrand(id, brandId) {
+  const b = brandOf(brandId);
+  main.innerHTML = '<a class="back" href="#/brands">' + I.left + ' All brands</a><div id="rd"><div class="sk" style="height:320px;border-radius:24px"></div></div>';
+  let data = null;
+  if (st.online) { try { data = await api('/api/brands/' + encodeURIComponent(brandId)); } catch (e) { data = null; } }
+  if (!live(id)) return;
+  const regions = data ? data.regions : (st.demo ? demoRegions() : []);
+  const provider = data ? data.provider : (st.config && st.config.provider) || { connected: false };
+  const sample = !data && st.demo;
+  const max = (st.config && st.config.maxCardsPerOrder) || 5;
+  let country = regions.find((r) => r.code === (store('country') || 'US')) ? (store('country') || 'US') : (regions[0] && regions[0].code);
+  const qty = {};
+
+  $('#rd').innerHTML = '<div class="redeem"><div class="card"><div class="rtop">' + tile(b) + '<div><h2>Redeem ' + esc(b.name) + '</h2><p>Redeem your balance for this gift card.</p><div class="avail">Available <b class="num" id="availV">—</b></div></div></div>' +
+    '<div id="rbody"></div></div>' +
+    '<div class="card"><h3 style="margin:0 0 2px;font:700 18px/1.2 var(--display)">Your gift cards</h3><p class="muted" style="margin:0 0 14px;font-size:13.5px">Gift cards bought with this wallet.</p><div id="mycards"></div></div></div>' +
+    (data && data.coins && data.coins.length ? '<div class="bar" style="margin-top:10px"><h2>' + esc(b.name) + ' coins</h2></div><div class="coins">' + data.coins.map(coinCard).join('') + '</div>' : '');
+
+  const bal = () => { const x = st.walletInfo && st.walletInfo.balances.find((y) => y.brand === b.id); return x ? x.lamports : 0; };
+  const region = () => regions.find((r) => r.code === country);
+  const lamFor = (usdV) => (st.solUsd ? Math.ceil((usdV / st.solUsd) * LAMPORTS) : 0);
+
+  function renderBody() {
+    $('#availV').textContent = st.address ? usd(lamUsd(bal())) + ' · ' + sol(bal()) : '—';
+    const body = $('#rbody');
+    if (!regions.length) {
+      body.innerHTML = '<div class="empty-box"><h3>' + (provider.connected ? 'No ' + esc(b.name) + ' cards right now' : 'Gift cards aren\'t connected yet') + '</h3><p>' +
+        (provider.connected ? 'The provider has no ' + esc(b.name) + ' cards in stock. Your balance stays put, and you can move it to another brand below.' : 'Balances keep growing and can be redeemed as soon as the gift card provider is connected.') + '</p></div>' + otherOptions();
+      wireOther();
+      return;
+    }
+    const r = region();
+    const totalCards = Object.values(qty).reduce((s, n) => s + n, 0);
+    const totalUsd = r.packages.reduce((s, p) => s + (qty[p.id] || 0) * p.usd, 0);
+    const totalLam = r.packages.reduce((s, p) => s + (qty[p.id] || 0) * lamFor(p.usd), 0);
+    body.innerHTML =
+      '<div class="field" style="margin-bottom:14px"><label>Country</label><div class="select" id="csel"><button type="button"><span class="mono" style="width:26px;color:var(--muted)">' + esc(r.code) + '</span><span class="tx"><b>' + esc(r.name) + '</b></span>' + I.chev + '</button></div></div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px"><div><div class="flabel">Amounts</div><div class="hint">Up to ' + max + ' gift cards.' + (sample ? ' Sample prices.' : '') + '</div></div><button class="btn sm" id="maxBtn" type="button">Max</button></div>' +
+      '<div class="amts">' + r.packages.map((p) => '<div class="amt"><b class="num">' + esc(p.value) + ' ' + esc(r.currency) + '</b><small class="num">' + (r.currency === 'USD' ? '' : usd(p.usd) + ' ') + (st.solUsd ? '≈ ' + sol(lamFor(p.usd), 3) : '') + '</small><div class="qty"><button type="button" data-d="-1" data-p="' + esc(p.id) + '" aria-label="Fewer">−</button><span class="num">' + (qty[p.id] || 0) + '</span><button type="button" data-d="1" data-p="' + esc(p.id) + '" aria-label="More">+</button></div></div>').join('') + '</div>' +
+      '<div class="sumline"><span>' + totalCards + ' card' + (totalCards === 1 ? '' : 's') + '</span><span><b class="num">' + usd(totalUsd) + '</b>' + (totalLam ? ' <span class="num">· ' + sol(totalLam) + '</span>' : '') + '</span></div>' +
+      (st.address ? '<button class="btn pri lg block" id="redeemBtn" ' + (totalCards && !sample && provider.connected ? '' : 'disabled') + '>' + (totalLam > bal() ? 'Not enough balance' : totalCards ? 'Redeem ' + totalCards + ' card' + (totalCards === 1 ? '' : 's') : 'Pick a card') + '</button>' : '<button class="btn pri lg block" id="redeemBtn">Connect wallet</button>') +
+      otherOptions();
+    $$('.qty button', body).forEach((btn) => (btn.onclick = () => {
+      const p = btn.dataset.p, d = Number(btn.dataset.d);
+      const cur = qty[p] || 0;
+      if (d > 0 && Object.values(qty).reduce((s, n) => s + n, 0) >= max) return toast('Up to ' + max + ' gift cards per order');
+      qty[p] = Math.max(0, cur + d);
+      renderBody();
+    }));
+    $('#maxBtn').onclick = () => {
+      for (const k in qty) delete qty[k];
+      let left = bal(), n = 0;
+      const sorted = r.packages.slice().sort((a, b2) => b2.usd - a.usd);
+      for (const p of sorted) { while (n < max && lamFor(p.usd) <= left) { qty[p.id] = (qty[p.id] || 0) + 1; left -= lamFor(p.usd); n++; } }
+      if (!n) toast(st.address ? 'Your balance doesn\'t cover the smallest card yet' : 'Connect a wallet first');
+      renderBody();
+    };
+    $('#csel button').onclick = () => openSelect($('#csel'), regions.map((x) => ({ id: x.code, label: x.name, sub: x.code })), country, (v) => { country = v; store('country', v); for (const k in qty) delete qty[k]; renderBody(); });
+    $('#redeemBtn').onclick = async () => {
+      if (!st.address) return openConnect();
+      const items = Object.entries(qty).filter(([, n]) => n > 0).map(([packageId, n]) => ({ packageId: packageId, qty: n }));
+      const btn = $('#redeemBtn');
+      btn.disabled = true; btn.textContent = 'Confirm in your wallet…';
+      try {
+        const res = await signed('redeem', { brand: b.id, country: country, items: items }, '/api/redeem');
+        for (const k in qty) delete qty[k];
+        await loadWalletInfo();
+        showRedeemed(res.redemptions);
+        loadCards(true);
+      } catch (e) {
+        toast(esc(e.message), 'bad');
+      }
+      renderBody();
+    };
+    wireOther();
+  }
+
+  function otherOptions() {
+    if (!st.address || !bal()) return '';
+    return '<div class="other"><div>Not in your region? Move this balance to another brand, or cash it out as SOL (' + (((st.config && st.config.cashoutPenaltyBps) || 2000) / 100) + '% penalty, so the gift card is the better deal).</div><div class="acts"><button class="btn sm" id="moveBtn">Move balance</button><button class="btn sm" id="cashBtn">Cash out as SOL</button></div></div>';
+  }
+  function wireOther() {
+    const mv = $('#moveBtn'), cs = $('#cashBtn');
+    if (mv) mv.onclick = () => openSelect(mv.parentElement, REG.brands.filter((x) => x.id !== b.id).map((x) => ({ id: x.id, label: x.name, sub: x.category })), '', async (to) => {
+      try { await signed('transfer', { from: b.id, to: to, lamports: 'all' }, '/api/transfer'); await loadWalletInfo(); toast('Moved your balance to ' + esc(brandOf(to).name), 'ok'); renderBody(); }
+      catch (e) { toast(esc(e.message), 'bad'); }
+    }, true);
+    if (cs) cs.onclick = async () => {
+      const pen = ((st.config && st.config.cashoutPenaltyBps) || 2000) / 10000;
+      const m = modal('<div class="mh"><div><h3>Cash out as SOL</h3><p>You receive ' + sol(Math.floor(bal() * (1 - pen))) + '. The ' + pen * 100 + '% penalty (' + sol(Math.ceil(bal() * pen)) + ') goes to buy &amp; burn.</p></div><button class="iconbtn" data-close aria-label="Close">' + I.x + '</button></div><button class="btn pri lg block" id="coGo">Cash out ' + sol(bal()) + '</button>');
+      $('#coGo', m.el).onclick = async () => {
+        $('#coGo', m.el).disabled = true; $('#coGo', m.el).textContent = 'Confirm in your wallet…';
+        try {
+          const r = await signed('cashout', { brand: b.id, lamports: 'all' }, '/api/cashout');
+          m.close();
+          const c = r.cashout;
+          if (c.status === 'done') toast('Sent ' + sol(c.payout) + ' to your wallet. <a href="https://solscan.io/tx/' + esc(c.sig) + '" target="_blank" rel="noopener">View</a>', 'ok', 9000);
+          else if (c.status === 'refunded') toast('The cash-out didn\'t go through, so your balance was restored.', 'bad');
+          else toast('Cash-out sent. It can take a minute to confirm.', '');
+          await loadWalletInfo(); renderBody();
+        } catch (e) { m.close(); toast(esc(e.message), 'bad'); }
+      };
+    };
+  }
+
+  async function loadCards(signedIn) {
+    const box = $('#mycards');
+    if (!box) return;
+    if (!st.address) { box.innerHTML = '<div class="empty-box" style="padding:26px 16px"><p style="margin-bottom:12px">Connect a wallet to view your gift cards.</p><button class="btn pri" id="mcConnect">Connect wallet</button></div>'; $('#mcConnect').onclick = openConnect; return; }
+    if (!signedIn) {
+      const n = st.walletInfo ? st.walletInfo.cards + st.walletInfo.pendingCards : 0;
+      box.innerHTML = '<div class="empty-box" style="padding:26px 16px"><p style="margin-bottom:12px">' + (n ? n + ' gift card' + (n === 1 ? '' : 's') + ' on this wallet. Sign to show the codes.' : 'No gift cards on this wallet yet.') + '</p>' + (n ? '<button class="btn" id="mcShow">Show my cards</button>' : '') + '</div>';
+      if (n) $('#mcShow').onclick = () => loadCards(true);
+      return;
+    }
+    try {
+      const r = await signed('cards', {}, '/api/cards');
+      box.innerHTML = r.cards.length ? '<div class="giftcards">' + r.cards.map(cardHtml).join('') + '</div>' : '<div class="empty-box" style="padding:26px 16px"><p style="margin:0">No gift cards on this wallet yet.</p></div>';
+      $$('[data-copy]', box).forEach((x) => (x.onclick = () => copyText(x.dataset.copy, 'Code copied')));
+    } catch (e) { toast(esc(e.message), 'bad'); }
+  }
+
+  renderBody();
+  loadCards(false);
+  document.addEventListener('stash:wallet', function onW() { if (!live(id)) return document.removeEventListener('stash:wallet', onW); renderBody(); loadCards(false); });
+}
+
+function cardHtml(c) {
+  const b = brandOf(c.brand);
+  const codes = (c.cards || []).map((k) => '<div class="code"><span>' + esc(k.code) + (k.pin ? ' · PIN ' + esc(k.pin) : '') + '</span><button class="iconbtn" style="width:26px;height:26px" data-copy="' + esc(k.code) + '" aria-label="Copy code">' + I.copy + '</button></div>' + (k.url ? '<a class="faint" href="' + esc(k.url) + '" target="_blank" rel="noopener" style="font-size:12px">Redeem link ' + I.out + '</a>' : '')).join('');
+  return '<div class="gc"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(b.name) + ' · ' + esc(c.value) + ' ' + esc(c.currency || '') + '</b><span class="status ' + esc(c.status) + '">' + esc(c.status === 'done' ? 'Ready' : c.status === 'refunded' ? 'Refunded' : 'Processing') + '</span></div>' +
+    (codes || (c.status === 'refunded' ? '<div class="faint" style="font-size:12.5px">' + esc(c.error || 'The provider could not issue this card. Your balance was restored.') + '</div>' : '<div class="faint" style="font-size:12.5px">The provider is still issuing this card. Check back in a few minutes.</div>')) + '</div>';
+}
+function showRedeemed(list) {
+  const done = list.filter((r) => r.status === 'done').length;
+  const failed = list.filter((r) => r.status === 'refunded').length;
+  const pending = list.length - done - failed;
+  modal('<div class="mh"><div><h3>' + (done ? 'Your gift cards are ready' : 'Order received') + '</h3><p>' +
+    [done ? done + ' issued' : '', pending ? pending + ' still processing' : '', failed ? failed + ' failed and refunded' : ''].filter(Boolean).join(', ') +
+    '. Codes are in “Your gift cards”.</p></div><button class="iconbtn" data-close aria-label="Close">' + I.x + '</button></div><button class="btn pri block" data-close>Done</button>');
+}
+function demoRegions() {
+  return [{ code: 'US', name: 'United States', currency: 'USD', packages: [{ id: 's:10', value: '10', usd: 10.5 }, { id: 's:25', value: '25', usd: 25.5 }, { id: 's:50', value: '50', usd: 50.5 }] }];
+}
+
+/** Searchable dropdown anchored to an element. */
+function openSelect(anchor, options, current, onPick, searchable) {
+  $$('.select .list, .floatlist').forEach((x) => x.remove());
+  const list = document.createElement('div');
+  list.className = 'list floatlist';
+  list.style.cssText = 'position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:var(--card);border:1px solid var(--line-2);border-radius:13px;box-shadow:0 22px 44px -14px rgba(0,0,0,.7);padding:6px;max-height:330px;overflow:auto;min-width:240px';
+  const draw = (f) => {
+    const opts = options.filter((o) => !f || (o.label + ' ' + (o.sub || '')).toLowerCase().includes(f.toLowerCase()));
+    $('.opts', list).innerHTML = opts.map((o) => '<button type="button" data-v="' + esc(o.id) + '" class="' + (o.id === current ? 'on' : '') + '" style="display:flex;align-items:center;gap:10px;width:100%;padding:7px 8px;border-radius:9px;border:0;background:' + (o.id === current ? 'var(--card-2)' : 'none') + ';cursor:pointer;text-align:left;font-size:14px">' + (o.html || '') + esc(o.label) + '<small style="color:var(--faint);margin-left:auto;font-size:12px">' + esc(o.sub || '') + '</small></button>').join('') || '<div class="muted" style="padding:8px;font-size:13px">No matches</div>';
+    $$('button', list).forEach((b) => (b.onclick = (e) => { e.stopPropagation(); list.remove(); onPick(b.dataset.v); }));
+  };
+  list.innerHTML = (searchable || options.length > 8 ? '<input class="inp" placeholder="Search" style="height:38px;margin-bottom:6px">' : '') + '<div class="opts"></div>';
+  if (getComputedStyle(anchor).position === 'static') anchor.style.position = 'relative';
+  anchor.appendChild(list);
+  draw('');
+  const inp = $('input', list);
+  if (inp) { inp.oninput = () => draw(inp.value); inp.onclick = (e) => e.stopPropagation(); setTimeout(() => inp.focus(), 20); }
+  setTimeout(() => document.addEventListener('click', function off(e) { if (!list.contains(e.target)) { list.remove(); document.removeEventListener('click', off); } }), 0);
+}
+
+/* ========================================================== leaderboard */
+
+async function viewLeaderboard(id) {
+  main.innerHTML = '<div class="ph"><h1>Leaderboard</h1><p>Wallets paid the most in gift card credit.</p></div><div id="lb"><div class="sk" style="height:200px;border-radius:24px"></div></div>';
+  let page = 1;
+  const draw = async () => {
+    let d = null;
+    if (st.online) { try { d = await api('/api/leaderboard?page=' + page); } catch (e) { d = null; } }
+    if (!live(id)) return;
+    const box = $('#lb');
+    if (!d || !d.rows.length) {
+      box.innerHTML = '<div class="empty-box"><h3>No one has been paid yet</h3><p>The first wallets show up here after the first fee claim. Holders are paid in their coin\'s brand credit.</p><a class="btn pri" href="#/launch">Launch a token</a></div>';
+      return;
+    }
+    const top = d.rows[0].earnedLamports || 1;
+    const p = (r, cls, label) => r ? '<div class="card pod ' + cls + '"><div class="rk">#' + r.rank + '</div><div class="av">' + avatar(r.wallet) + '</div><div class="w mono">' + short(r.wallet) + '</div><div class="v num">' + usd(r.earnedUsd) + '</div><div class="meter"><i style="width:' + Math.max(4, (r.earnedLamports / top) * 100) + '%"></i></div><div class="rd">Redeemed<b class="num">' + usd(r.redeemed.usd) + '</b><span class="num">' + r.redeemed.cards + ' cards</span></div></div>' : '<div></div>';
+    const rest = page === 1 ? d.rows.slice(3) : d.rows;
+    box.innerHTML = (page === 1 ? '<div class="podium">' + p(d.rows[1], '', '#2') + p(d.rows[0], 'first', '#1') + p(d.rows[2], '', '#3') + '</div>' : '') +
+      '<div class="totals"><div class="panel"><div class="lb">Earned</div><div class="v num">' + usd(d.totals.earnedUsd) + '</div><div class="faint num" style="font-size:12.5px">' + sol(d.totals.earnedLamports, 2) + ' · ' + d.players + ' wallets</div></div><div class="panel"><div class="lb">Redeemed</div><div class="v num">' + usd(d.totals.redeemedUsd) + '</div><div class="faint num" style="font-size:12.5px">' + d.totals.cards + ' gift cards</div></div></div>' +
+      (rest.length ? '<div class="panel lrows">' + rest.map((r) => '<div class="lr"><span class="faint num">#' + r.rank + '</span><div class="who"><span class="av">' + avatar(r.wallet) + '</span><span class="mono">' + short(r.wallet) + '</span><div class="meter"><i style="width:' + Math.max(3, (r.earnedLamports / top) * 100) + '%"></i></div></div><div class="amt num">Earned <b>' + usd(r.earnedUsd) + '</b> · Redeemed <b>' + usd(r.redeemed.usd) + '</b></div></div>').join('') + '</div>' : '') +
+      (d.pages > 1 ? '<div class="pager" style="justify-content:center;margin-top:14px"><button class="iconbtn" id="lp" ' + (page <= 1 ? 'disabled' : '') + ' aria-label="Previous page">' + I.left + '</button><span class="num">' + page + ' / ' + d.pages + '</span><button class="iconbtn" id="ln" ' + (page >= d.pages ? 'disabled' : '') + ' aria-label="Next page">' + I.right + '</button></div>' : '');
+    const lp = $('#lp'), ln = $('#ln');
+    if (lp) lp.onclick = () => { page--; draw(); };
+    if (ln) ln.onclick = () => { page++; draw(); };
+  };
+  draw();
+}
+
+/* ================================================================= coin */
+
+async function viewCoin(id, mint) {
+  main.innerHTML = '<div class="cp"><div><div class="sk" style="height:60px;margin-bottom:14px"></div><div class="sk" style="height:380px;border-radius:24px"></div></div><div class="sk" style="height:420px;border-radius:24px"></div></div>';
+  let c = null;
+  const sampleCoin = SAMPLE.find((x) => x.mint === mint);
+  if (sampleCoin) c = Object.assign({ status: 'listed', distributed: { usd: 0, lamports: 0, wallets: 0 }, claimed: { usd: 0 }, inVault: { usd: 0, lamports: 0 }, recipients: { items: [], page: 1, pages: 1, total: 0 }, market: {}, description: 'This is a sample coin that shows the layout. It is not live.', floorTokens: 1000000, pot: { usd: 0, lamports: 0 }, draws: [] }, sampleCoin);
+  else if (st.online) {
+    try { c = await api('/api/coins/' + mint); } catch (e) {
+      if (e.status !== 404) throw e;
+    }
+  }
+  if (!live(id)) return;
+  if (!c) return coinNotListed(id, mint);
+  if (c.status !== 'listed') return coinPending(id, c);
+  const b = brandOf(c.brand);
+  const isGive = c.mode === 'giveaway';
+  main.innerHTML = '<div class="cp"><div style="min-width:0">' +
+    '<div class="chead"><div class="ci"><img alt="" src="' + esc(coinImg(c)) + '"></div><div style="min-width:0"><h1>' + esc(c.name) + ' <span>' + esc(c.symbol) + '</span>' + (c.sample ? ' <span class="tag sample" style="vertical-align:4px">Sample</span>' : '') + '</h1>' +
+      '<div class="by">' + (c.createdAt ? ago(c.createdAt) + ' · ' : '') + (c.creator ? 'created by <span class="mono">' + short(c.creator) + '</span>' : '') + '</div></div>' +
+      '<div class="rt"><a href="https://pump.fun/coin/' + esc(mint) + '" target="_blank" rel="noopener" style="display:inline-flex;gap:4px;align-items:center">pump.fun ' + I.out + '</a><button class="ca mono" id="caBtn">' + short(mint, 6) + ' ' + I.copy + '</button></div></div>' +
+    '<div class="card mkt"><div class="top2"><div><div class="lb">Market cap</div><div class="big num">' + (c.market && c.market.mcapUsd ? usd(c.market.mcapUsd) : '—') + '</div></div>' +
+      '<div class="seg" id="tf"><button data-tf="5m">5M</button><button data-tf="1h" class="on">1H</button><button data-tf="6h">6H</button><button data-tf="1d">1D</button><button data-tf="all">ALL</button></div></div>' +
+      '<div class="kv"><span>Price <b class="num">' + price(c.market && c.market.priceUsd) + '</b></span><span>Liquidity <b class="num">' + (c.market && c.market.liquidityUsd ? usd(c.market.liquidityUsd) : '—') + '</b></span><span>Volume <b class="num">' + (c.market && c.market.volumeUsd ? usd(c.market.volumeUsd) : '—') + '</b></span></div>' +
+      '<div class="chart" id="chart"><div class="none">Loading chart…</div></div></div>' +
+    '<div class="desc"><h5>Description</h5><p>' + esc(c.description || 'No description.') + '</p>' +
+      '<div class="links"><a class="chip" href="https://pump.fun/coin/' + esc(mint) + '" target="_blank" rel="noopener">Trade on pump.fun ' + I.out + '</a><a class="chip" href="https://gmgn.ai/sol/token/' + esc(mint) + '" target="_blank" rel="noopener">Chart ' + I.out + '</a>' +
+      (c.twitter && /^https?:/.test(c.twitter) ? '<a class="chip" href="' + esc(c.twitter) + '" target="_blank" rel="noopener">' + I.xlogo + ' X</a>' : '') +
+      (c.telegram && /^https?:/.test(c.telegram) ? '<a class="chip" href="' + esc(c.telegram) + '" target="_blank" rel="noopener">' + I.send + ' Telegram</a>' : '') + '</div></div>' +
+    '</div><aside class="card side">' +
+      '<div class="bline">' + tile(b) + '<div style="flex:1;min-width:0"><b>' + esc(b.name) + '</b><small>' + esc(b.category) + ' · <span id="availTxt">' + (st.address ? usd(lamUsd(myBal(b.id))) + ' available' : 'Connect a wallet') + '</span></small></div><a class="btn sm" href="#/brand/' + esc(b.id) + '">Redeem</a></div>' +
+      '<div class="qual">Hold at least ' + compact(c.floorTokens || FLOORS[c.floor] || 1000000) + ' tokens to qualify' + (isGive ? ' for the draw.' : '.') + '</div>' +
+      (isGive ? giveawayBox(c) :
+        '<div class="kpi"><div class="lb">' + I.users + ' Dividends distributed</div><div class="v num">' + usd(c.distributed.usd) + '</div></div>') +
+      '<div class="kpis"><div><div class="lb">Claimed</div><div class="v num">' + usd(c.claimed.usd) + '</div></div><div><div class="lb">In the vault</div><div class="v num">' + usd(c.inVault.usd) + '</div></div></div>' +
+      '<div><div class="rhead"><span>' + (isGive ? 'Winners' : 'Recipients') + '</span><div class="pager"><button class="iconbtn" id="rp" aria-label="Previous page">' + I.left + '</button><span class="num" id="rl">' + c.recipients.page + ' / ' + c.recipients.pages + '</span><button class="iconbtn" id="rn" aria-label="Next page">' + I.right + '</button></div></div><div class="reclist" id="recs">' + recRows(c.recipients.items) + '</div></div>' +
+    '</aside></div>';
+  $('#caBtn').onclick = () => copyText(mint, 'Contract address copied');
+  // chart
+  const loadChart = async (tf) => {
+    const box = $('#chart');
+    if (!box) return;
+    if (!st.online || c.sample) { box.innerHTML = '<div class="none">No trades in this range yet.</div>'; return; }
+    try {
+      const r = await api('/api/coins/' + mint + '/chart?tf=' + tf);
+      box.innerHTML = r.candles.length > 1 ? candleChart(r.candles, box.clientWidth, box.clientHeight) : '<div class="none">No trades in this range yet.</div>';
+    } catch (e) { box.innerHTML = '<div class="none">Chart unavailable</div>'; }
+  };
+  $$('#tf button').forEach((bt) => (bt.onclick = () => { $$('#tf button').forEach((x) => x.classList.toggle('on', x === bt)); loadChart(bt.dataset.tf); }));
+  loadChart('1h');
+  // recipients paging
+  let rpage = c.recipients.page;
+  const pages = c.recipients.pages;
+  const setPager = () => { $('#rp').disabled = rpage <= 1; $('#rn').disabled = rpage >= pages; $('#rl').textContent = rpage + ' / ' + pages; };
+  setPager();
+  const go = async (d) => { rpage += d; setPager(); try { const r = await api('/api/coins/' + mint + '?rpage=' + rpage); $('#recs').innerHTML = recRows(r.recipients.items); } catch (e) { toast(esc(e.message), 'bad'); } };
+  $('#rp').onclick = () => go(-1); $('#rn').onclick = () => go(1);
+  if (isGive) tickDraw(id, c.nextDrawAt);
+  document.addEventListener('stash:wallet', function onW() { if (!live(id)) return document.removeEventListener('stash:wallet', onW); const a = $('#availTxt'); if (a) a.textContent = st.address ? usd(lamUsd(myBal(b.id))) + ' available' : 'Connect a wallet'; });
+}
+function myBal(brand) { const x = st.walletInfo && st.walletInfo.balances.find((y) => y.brand === brand); return x ? x.lamports : 0; }
+function recRows(items) {
+  if (!items || !items.length) return '<div class="faint" style="font-size:13px;padding:10px 0">No payouts yet. The first claim happens once 0.1 SOL of fees has built up.</div>';
+  return items.map((r) => '<div class="rec"><span class="av">' + avatar(r.wallet) + '</span><span class="w mono">' + short(r.wallet) + '</span><b class="num">' + usd(r.usd) + '</b><span class="faint num" style="min-width:64px;text-align:right">' + sol(r.lamports, 3) + '</span></div>').join('');
+}
+function giveawayBox(c) {
+  const last = (c.draws || [])[0];
+  return '<div class="kpi"><div class="lb">' + I.clock + ' Next draw in</div><div class="countdown num" id="cd">--:--</div><div class="faint" style="font-size:12.5px;margin-top:4px">Draws run at :00, :10, :20, :30, :40 and :50 UTC.</div></div>' +
+    '<div class="kpis" style="border-top:0;padding-top:0"><div><div class="lb">Pot</div><div class="v num">' + usd(c.pot && c.pot.usd) + '</div></div><div><div class="lb">Prize per winner</div><div class="v num">' + (c.prizeUsd ? usd(c.prizeUsd) : '—') + '</div></div></div>' +
+    '<div class="kpi"><div class="lb">' + I.gift + ' Paid in prizes</div><div class="v num">' + usd(c.distributed.usd) + '</div>' + (last ? '<div class="faint" style="font-size:12.5px;margin-top:4px">Last draw: ' + (last.status === 'paid' ? last.seats + ' winner' + (last.seats === 1 ? '' : 's') : esc(last.detail || 'carried over')) + '</div>' : '') + '</div>';
+}
+function tickDraw(id, at) {
+  const step = () => {
+    if (!live(id)) return;
+    const el = $('#cd');
+    if (!el) return;
+    let left = Math.max(0, (at || 0) - Date.now());
+    if (!at || left <= 0) { const ms = 600000; at = Math.ceil(Date.now() / ms) * ms; left = at - Date.now(); }
+    const m = Math.floor(left / 60000), s = Math.floor((left % 60000) / 1000);
+    el.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    setTimeout(step, 1000);
+  };
+  step();
+}
+
+function coinNotListed(id, mint) {
+  main.innerHTML = '<div class="ph"><h1>This coin isn\'t on Stash</h1><p class="mono" style="overflow-wrap:anywhere">' + esc(mint) + '</p></div>' +
+    '<p class="muted" style="max-width:560px">Only coins launched with their fees locked to Stash show up here. If you just launched it, give it a minute.</p>' +
+    '<div style="display:flex;gap:10px;margin-top:16px"><button class="btn" id="recheck">Check again</button><a class="btn" href="https://pump.fun/coin/' + esc(mint) + '" target="_blank" rel="noopener">View on pump.fun ' + I.out + '</a></div>';
+  $('#recheck').onclick = async () => {
+    if (!st.online) return toast('The Stash server isn\'t connected', 'bad');
+    try { const r = await api('/api/coins/register', { method: 'POST', body: { mint: mint } }); toast(r.status === 'listed' ? 'Listed' : esc(r.reason || 'Still checking'), r.status === 'listed' ? 'ok' : ''); if (r.status !== 'rejected') route(); } catch (e) { toast(esc(e.message), 'bad'); }
+  };
+}
+
+async function coinPending(id, c) {
+  const rejected = c.status === 'rejected';
+  main.innerHTML = '<div class="ph"><h1>' + (rejected ? 'Not listed' : 'Almost there') + '</h1><p>' + esc(c.reason || (rejected ? 'This coin does not meet the listing rules.' : 'Stash is checking this coin.')) + '</p></div>' +
+    '<p class="mono faint" style="overflow-wrap:anywhere">' + esc(c.mint) + '</p><div id="finish"></div>' +
+    '<div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button class="btn" id="recheck">Check again</button><a class="btn" href="https://pump.fun/coin/' + esc(c.mint) + '" target="_blank" rel="noopener">View on pump.fun ' + I.out + '</a><a class="btn ghost" href="#/docs">Listing rules</a></div>';
+  $('#recheck').onclick = async () => {
+    try { const r = await api('/api/coins/register', { method: 'POST', body: { mint: c.mint } }); if (r.status === 'listed') { toast('Listed', 'ok'); route(); } else toast(esc(r.reason || 'Still checking')); } catch (e) { toast(esc(e.message), 'bad'); }
+  };
+  if (rejected) return;
+  const showFinish = async () => {
+    const box = $('#finish');
+    if (!box) return;
+    if (!st.address) { box.innerHTML = '<p class="muted">If you launched this coin, connect the wallet you launched it with to finish the setup.</p>'; return; }
+    try {
+      const scAddr = S.b58encode(await S.derive.sharingConfig(c.mint));
+      const bcAddr = S.b58encode(await S.derive.bondingCurve(c.mint));
+      const [scAcc, bcAcc] = await Promise.all([account(scAddr), account(bcAddr)]);
+      const curve = bcAcc ? S.decodeBondingCurve(bcAcc.data) : null;
+      const sc = scAcc ? S.decodeSharingConfig(scAcc.data) : null;
+      const mine = (sc && !sc.adminRevoked && sc.admin === st.address) || (!sc && curve && curve.creator === st.address);
+      if (!mine) { box.innerHTML = ''; return; }
+      const saved = store('launch:' + c.mint) || {};
+      box.innerHTML = '<div class="card" style="padding:18px;max-width:520px;margin-top:16px"><h3 style="margin:0 0 6px;font:700 18px/1.2 var(--display)">Finish setup</h3><p class="muted" style="margin:0 0 14px;font-size:14px">The coin exists, but its fee split isn\'t locked to Stash yet. One more signature finishes it.</p>' +
+        '<div class="field" style="margin-bottom:12px"><label>Brand</label><div class="select" id="fBrand"><button type="button"></button></div></div>' +
+        '<div class="field" style="margin-bottom:12px"><label>Launch mode</label><div class="seg big" id="fMode"><button type="button" data-m="dividends">' + I.users + ' Dividends</button><button type="button" data-m="giveaway">' + I.gift + ' Giveaway</button></div></div>' +
+        '<div class="field" style="margin-bottom:14px"><label>Minimum holding</label><div class="floors" id="fFloor">' + FLOORS.map((f, i) => '<button type="button" data-f="' + i + '"><b>' + compact(f) + '</b><small>' + [0.01, 0.1, 1][i] + '%</small></button>').join('') + '</div></div>' +
+        '<button class="btn pri lg block" id="fGo">Lock the fee split</button></div>';
+      const f = { brand: saved.brand || 'steam', mode: saved.mode || 'dividends', floor: saved.floor == null ? 1 : saved.floor };
+      const paint = () => {
+        const bb = brandOf(f.brand);
+        $('#fBrand button').innerHTML = tile(bb, 'sm') + '<span class="tx"><b>' + esc(bb.name) + '</b><small>' + esc(bb.category) + '</small></span>' + I.chev;
+        $$('#fMode button').forEach((x) => x.classList.toggle('on', x.dataset.m === f.mode));
+        $$('#fFloor button').forEach((x) => x.classList.toggle('on', Number(x.dataset.f) === f.floor));
+      };
+      paint();
+      $('#fBrand button').onclick = () => openSelect($('#fBrand'), REG.brands.map((x) => ({ id: x.id, label: x.name, sub: x.category })), f.brand, (v) => { f.brand = v; paint(); }, true);
+      $$('#fMode button').forEach((x) => (x.onclick = () => { f.mode = x.dataset.m; paint(); }));
+      $$('#fFloor button').forEach((x) => (x.onclick = () => { f.floor = Number(x.dataset.f); paint(); }));
+      $('#fGo').onclick = async () => {
+        const btn = $('#fGo');
+        btn.disabled = true; btn.textContent = 'Confirm in your wallet…';
+        try {
+          const bh = await rpc('getLatestBlockhash', [{ commitment: 'confirmed' }]);
+          const lock = await S.buildLock({
+            creator: st.address, mint: c.mint, brand: f.brand, mode: f.mode, floor: f.floor,
+            wallets: st.config.wallets, recentBlockhash: bh.value.blockhash, configExists: !!sc,
+            currentShareholders: sc ? sc.shareholders.map((s) => s.address) : [st.address]
+          });
+          const [signedTx] = await signTxs([S.serializeTx(lock.message, lock.signers.map(() => null))]);
+          if (!S.bytesEqual(S.parseTx(signedTx).message, lock.message)) throw new Error('Your wallet changed the transaction. Try another wallet.');
+          btn.textContent = 'Locking…';
+          const sig = await rpc('sendTransaction', [S.b64encode(signedTx), { encoding: 'base64', preflightCommitment: 'confirmed' }]);
+          await confirmSig(sig);
+          await api('/api/coins/register', { method: 'POST', body: { mint: c.mint } });
+          toast('Fee split locked', 'ok');
+          route();
+        } catch (e) { toast(esc(rpcErrorText(e)), 'bad'); btn.disabled = false; btn.textContent = 'Lock the fee split'; }
+      };
+    } catch (e) { box.innerHTML = ''; }
+  };
+  showFinish();
+  document.addEventListener('stash:wallet', function onW() { if (!live(id)) return document.removeEventListener('stash:wallet', onW); showFinish(); });
+}
+
+/* ================================================================ launch */
+
+function viewLaunch(id) {
+  const f = Object.assign({ brand: 'steam', mode: 'dividends', floor: 1 }, store('draft') || {}, { file: null, preview: '' });
+  delete f.file;
+  main.innerHTML = '<form class="card launch" id="lf" novalidate><div class="l">' +
+    '<h1>Launch token <span class="pump"><i></i>on pump.fun</span></h1>' +
+    '<div class="row2"><div class="field"><label for="fn">Name</label><input class="inp" id="fn" maxlength="32" placeholder="Token name" autocomplete="off"></div>' +
+    '<div class="field"><label for="ft">Ticker</label><input class="inp" id="ft" maxlength="13" placeholder="Symbol" autocomplete="off"></div></div>' +
+    '<div class="field"><label for="fd">Description</label><textarea class="inp" id="fd" maxlength="500"></textarea></div>' +
+    '<div class="field"><span class="flabel">Token image</span><label class="pick" for="fi"><span class="ph-img" id="fiPrev">' + I.img + '</span><span><b style="font-weight:600;font-size:14px" id="fiName">Choose image</b><br><small class="faint">PNG, JPG, GIF or WebP, up to 5 MB</small></span></label><input type="file" id="fi" accept="image/png,image/jpeg,image/gif,image/webp" hidden></div>' +
+    '<div class="row2"><div class="field"><label for="fx">Twitter</label><input class="inp" id="fx" placeholder="x.com/handle" autocomplete="off"></div>' +
+    '<div class="field"><label for="fg">Telegram</label><input class="inp" id="fg" placeholder="t.me/community" autocomplete="off"></div></div>' +
+    '<div class="field"><label for="fb">Initial buy</label><div class="suffix"><input class="inp num" id="fb" inputmode="decimal" placeholder="0.00" autocomplete="off"><span><i class="solmark"></i>SOL</span></div><div class="hint">Optional. Buy some of your coin with SOL when it launches.</div></div>' +
+    '</div><div class="r">' +
+    '<div class="ytok"><div class="av" id="yAv">Y</div><div><b id="yName">Your token</b><small id="yTick">Ticker</small></div></div>' +
+    '<div id="yTile"></div>' +
+    '<div class="field"><span class="flabel">Brand</span><div class="select" id="bsel"><button type="button"></button></div><div class="hint">Fee earnings on this coin are redeemed as a gift card for this brand.</div></div>' +
+    '<div class="field"><span class="flabel">Launch mode</span><div class="seg big" id="mode"><button type="button" data-m="dividends">' + I.users + ' Dividends</button><button type="button" data-m="giveaway">' + I.gift + ' Giveaway</button></div><div class="hint" id="modeHint"></div></div>' +
+    '<div><button type="button" class="adv" id="advBtn">Advanced settings <span id="advVal"></span></button><div id="adv" hidden style="margin-top:10px"><div class="flabel" style="margin-bottom:6px">Minimum holding to qualify</div><div class="floors" id="floors">' + FLOORS.map((v, i) => '<button type="button" data-f="' + i + '"><b>' + compact(v) + '</b><small>' + [0.01, 0.1, 1][i] + '% of supply</small></button>').join('') + '</div><div class="hint" style="margin-top:6px">Locked at launch. It never changes.</div></div></div>' +
+    '<div id="lerr" class="err" hidden></div>' +
+    '<button class="btn pri lg block" id="lgo" type="submit">Connect wallet</button>' +
+    '<div class="hint" id="lcost"></div>' +
+    '</div></form>';
+
+  const el = { n: $('#fn'), t: $('#ft'), d: $('#fd'), x: $('#fx'), g: $('#fg'), b: $('#fb') };
+  el.n.value = f.name || ''; el.t.value = f.symbol || ''; el.d.value = f.description || ''; el.x.value = f.twitter || ''; el.g.value = f.telegram || ''; el.b.value = f.devBuy || '';
+  const paint = () => {
+    const b = brandOf(f.brand);
+    $('#yName').textContent = el.n.value.trim() || 'Your token';
+    $('#yTick').textContent = el.t.value.trim() ? '$' + el.t.value.trim().toUpperCase() : 'Ticker';
+    $('#yAv').innerHTML = f.preview ? '<img alt="" src="' + f.preview + '">' : esc((el.n.value.trim() || 'Y').slice(0, 1).toUpperCase());
+    $('#yTile').innerHTML = tile(b);
+    $('#bsel button').innerHTML = tile(b, 'sm') + '<span class="tx"><b>' + esc(b.name) + '</b><small>' + esc(b.category) + '</small></span>' + I.chev;
+    $$('#mode button').forEach((x) => x.classList.toggle('on', x.dataset.m === f.mode));
+    $('#modeHint').innerHTML = f.mode === 'giveaway' ? 'Rewards build up for 10 minutes, then eligible holders get tickets. Hold more, get more tickets. Each winner gets enough for one gift card. <a href="#/docs/launch-modes" style="text-decoration:underline">Read more</a>' : 'Each time fees are claimed, they are split across eligible wallets in proportion to their token holdings. <a href="#/docs/launch-modes" style="text-decoration:underline">Read more</a>';
+    $$('#floors button').forEach((x) => x.classList.toggle('on', Number(x.dataset.f) === f.floor));
+    $('#advVal').innerHTML = compact(FLOORS[f.floor]) + ' tokens ' + I.right;
+    el.d.placeholder = 'This coin is linked to ' + b.name + ' on ' + siteHost();
+    const go = $('#lgo');
+    go.textContent = st.address ? 'Launch $' + (el.t.value.trim().toUpperCase() || 'TOKEN') : 'Connect wallet';
+    const buy = Number(el.b.value) || 0;
+    $('#lcost').textContent = st.address ? 'Costs about 0.03 SOL in network rent and fees' + (buy > 0 ? ', plus your ' + buy + ' SOL initial buy.' : '.') : '';
+  };
+  const saveDraft = () => store('draft', { name: el.n.value, symbol: el.t.value, description: el.d.value, twitter: el.x.value, telegram: el.g.value, devBuy: el.b.value, brand: f.brand, mode: f.mode, floor: f.floor });
+  Object.values(el).forEach((i) => i.addEventListener('input', () => { paint(); saveDraft(); }));
+  $('#bsel button').onclick = () => openSelect($('#bsel'), REG.brands.map((b) => ({ id: b.id, label: b.name, sub: b.category, html: '<span class="dot cat-' + esc(b.category) + '"></span>' })), f.brand, (v) => { f.brand = v; paint(); saveDraft(); }, true);
+  $$('#mode button').forEach((x) => (x.onclick = () => { f.mode = x.dataset.m; paint(); saveDraft(); }));
+  $$('#floors button').forEach((x) => (x.onclick = () => { f.floor = Number(x.dataset.f); paint(); saveDraft(); }));
+  $('#advBtn').onclick = () => { $('#adv').hidden = !$('#adv').hidden; };
+  $('#fi').onchange = () => {
+    const file = $('#fi').files[0];
+    if (!file) return;
+    if (!/^image\/(png|jpe?g|gif|webp)$/.test(file.type)) return toast('Use a PNG, JPG, GIF or WebP image', 'bad');
+    if (file.size > 5 * 1024 * 1024) return toast('The image must be under 5 MB', 'bad');
+    f.file = file;
+    const reader = new FileReader();
+    reader.onload = () => { f.preview = reader.result; $('#fiPrev').innerHTML = '<img alt="" src="' + f.preview + '">'; $('#fiName').textContent = file.name; paint(); };
+    reader.readAsDataURL(file);
+  };
+  document.addEventListener('stash:wallet', function onW() { if (!live(id)) return document.removeEventListener('stash:wallet', onW); paint(); });
+  paint();
+  $('#lf').onsubmit = async (e) => {
+    e.preventDefault();
+    const err = $('#lerr');
+    err.hidden = true;
+    if (!st.address) return openConnect();
+    const name = el.n.value.trim(), symbol = el.t.value.trim().toUpperCase();
+    const problems = [];
+    if (!name) problems.push('Add a name.');
+    if (new TextEncoder().encode(name).length > 32) problems.push('The name is too long.');
+    if (!symbol) problems.push('Add a ticker.');
+    if (new TextEncoder().encode(symbol).length > 13) problems.push('The ticker is too long.');
+    if (!f.file) problems.push('Add an image.');
+    const buy = el.b.value.trim() ? Number(el.b.value) : 0;
+    if (!(buy >= 0) || buy > 100) problems.push('The initial buy must be between 0 and 100 SOL.');
+    if (!st.online || !st.config || !st.config.ready || !st.config.ready.launch) problems.push('Launching needs the Stash server, and it isn\'t connected right now.');
+    if (problems.length) { err.textContent = problems.join(' '); err.hidden = false; return; }
+    runLaunch({
+      name: name, symbol: symbol, description: el.d.value.trim(), twitter: normUrl(el.x.value, 'https://x.com/'), telegram: normUrl(el.g.value, 'https://t.me/'),
+      devBuyLamports: BigInt(Math.round(buy * LAMPORTS)), brand: f.brand, mode: f.mode, floor: f.floor, file: f.file
+    });
+  };
+}
+function siteHost() { try { return st.config && st.config.siteUrl ? new URL(st.config.siteUrl).host : location.host || 'stash'; } catch (e) { return 'stash'; } }
+function normUrl(v, prefix) {
+  v = (v || '').trim();
+  if (!v) return '';
+  if (/^https?:\/\//i.test(v)) return v;
+  if (/^(x|twitter)\.com\//i.test(v) || /^t\.me\//i.test(v)) return 'https://' + v;
+  return prefix + v.replace(/^@/, '');
+}
+
+async function runLaunch(o) {
+  const steps = [
+    ['upload', 'Upload image and details'],
+    ['sign', 'Approve in your wallet'],
+    ['create', 'Create the coin'],
+    ['buy', 'Initial buy'],
+    ['lock', 'Lock the fee split to Stash'],
+    ['list', 'List on Stash']
+  ];
+  const m = modal('<div class="mh"><div><h3>Launching $' + esc(o.symbol) + '</h3><p>Keep this window open until it finishes.</p></div></div><div class="steps">' + steps.map((s) => '<div class="step" data-s="' + s[0] + '"><span class="s"></span>' + esc(s[1]) + '</div>').join('') + '</div><div id="lmsg" class="err" hidden></div><div id="lacts" style="display:flex;gap:8px;margin-top:12px"></div>', { sticky: true });
+  const set = (k, state) => { const e = $('[data-s="' + k + '"]', m.el); if (e) { e.className = 'step ' + state; $('.s', e).innerHTML = state === 'ok' ? I.check : state === 'bad' ? I.x : ''; } };
+  const fail = (msg, k) => {
+    if (k) set(k, 'bad');
+    const box = $('#lmsg', m.el); box.textContent = msg; box.hidden = false;
+    $('#lacts', m.el).innerHTML = '<button class="btn" data-close>Close</button>';
+    $$('[data-close]', m.el).forEach((b) => (b.onclick = m.close));
+  };
+  if (!o.devBuyLamports) set('buy', 'skip');
+  let mint, coinMint;
+  try {
+    set('upload', 'run');
+    mint = await S.generateKeypair();
+    coinMint = mint.address;
+    store('launch:' + coinMint, { brand: o.brand, mode: o.mode, floor: o.floor, at: Date.now() });
+    const fd = new FormData();
+    fd.append('file', o.file);
+    fd.append('name', o.name); fd.append('symbol', o.symbol);
+    fd.append('description', o.description || ('This coin is linked to ' + brandOf(o.brand).name + ' on ' + siteHost()));
+    fd.append('twitter', o.twitter); fd.append('telegram', o.telegram);
+    fd.append('website', (st.config.siteUrl || location.origin) + '/#/coin/' + coinMint);
+    const up = await api('/api/ipfs', { method: 'POST', body: fd, timeout: 60000 });
+    set('upload', 'ok');
+
+    set('sign', 'run');
+    const bh = await rpc('getLatestBlockhash', [{ commitment: 'confirmed' }]);
+    let global = null;
+    if (o.devBuyLamports > 0n) { try { const g = await account(S.b58encode(await S.derive.global())); global = g ? S.decodeGlobal(g.data) : null; } catch (e) { global = null; } }
+    const plan = await S.buildLaunch({
+      creator: st.address, mint: coinMint, name: o.name, symbol: o.symbol, uri: up.metadataUri,
+      brand: o.brand, mode: o.mode, floor: o.floor, devBuyLamports: o.devBuyLamports, global: global,
+      wallets: st.config.wallets, recentBlockhash: bh.value.blockhash, lookupTable: st.config.lookupTable || null
+    });
+    const unsigned = plan.txs.map((t) => S.serializeTx(t.message, t.signers.map(() => null)));
+    const signedTxs = await signTxs(unsigned);
+    const ready = [];
+    for (let i = 0; i < plan.txs.length; i++) {
+      const t = plan.txs[i];
+      const back = S.parseTx(signedTxs[i]);
+      if (!S.bytesEqual(back.message, t.message)) throw Object.assign(new Error('Your wallet changed the transaction, so it was not sent. Try another wallet.'), { step: 'sign' });
+      ready.push(t.signers.includes(coinMint) ? await S.addSignatures(signedTxs[i], [mint]) : signedTxs[i]);
+    }
+    set('sign', 'ok');
+    store('draft', null);
+
+    const labels = { launch: ['create', 'lock'], 'create-buy': ['create', 'buy'], create: ['create'], buy: ['buy'], lock: ['lock'] };
+    for (let i = 0; i < plan.txs.length; i++) {
+      const ks = labels[plan.txs[i].label];
+      ks.forEach((k) => set(k, 'run'));
+      try {
+        const sig = await rpc('sendTransaction', [S.b64encode(ready[i]), { encoding: 'base64', preflightCommitment: 'confirmed', maxRetries: 5 }]);
+        await confirmSig(sig);
+        ks.forEach((k) => set(k, 'ok'));
+      } catch (e) {
+        ks.forEach((k) => set(k, 'bad'));
+        const label = plan.txs[i].label;
+        if (label === 'buy') { toast('The initial buy didn\'t go through. You can buy on pump.fun.', 'bad'); continue; }
+        if (label === 'lock') { fail('The coin is live, but the fee split isn\'t locked yet. Open the coin page to finish setup: ' + rpcErrorText(e)); addCoinLink(m, coinMint); return; }
+        if (label === 'create-buy') { fail('Nothing was created: ' + rpcErrorText(e)); return; }
+        fail('Nothing was created: ' + rpcErrorText(e));
+        return;
+      }
+    }
+
+    set('list', 'run');
+    let status = null;
+    for (let i = 0; i < 12; i++) {
+      try { status = await api('/api/coins/register', { method: 'POST', body: { mint: coinMint } }); } catch (e) { status = null; }
+      if (status && status.status !== 'pending') break;
+      await sleep(2500);
+    }
+    if (status && status.status === 'listed') {
+      set('list', 'ok');
+      m.close();
+      toast('$' + esc(o.symbol) + ' is live on Stash', 'ok', 7000);
+      location.hash = '#/coin/' + coinMint;
+    } else {
+      set('list', status && status.status === 'rejected' ? 'bad' : 'run');
+      fail(status && status.status === 'rejected' ? 'Stash couldn\'t list it: ' + (status.reason || 'unknown reason') : 'The coin is live. Listing is still being checked, which can take a minute.');
+      addCoinLink(m, coinMint);
+    }
+  } catch (e) {
+    const which = $$('.step.run', m.el)[0];
+    fail(e.message === 'User rejected the request.' || /reject|denied|cancel/i.test(e.message || '') ? 'You cancelled in your wallet. Nothing was sent.' : rpcErrorText(e), which && which.dataset.s);
+  }
+}
+function addCoinLink(m, mint) {
+  const acts = $('#lacts', m.el);
+  acts.innerHTML = '<a class="btn pri" href="#/coin/' + esc(mint) + '" data-close>Open coin page</a><button class="btn" data-close>Close</button>';
+  $$('[data-close]', m.el).forEach((b) => (b.onclick = m.close));
+}
+
+/* ============================================================== $STASH */
+
+async function viewStash(id) {
+  const name = esc(CFG.NAME || 'Stash'), tk = esc(CFG.TICKER || 'STASH');
+  let d = null;
+  if (st.online) { try { d = await api('/api/stash'); } catch (e) { d = null; } }
+  if (!live(id)) return;
+  const ca = CFG.CA || (d && d.mint) || '';
+  const x = CFG.X ? String(CFG.X).replace(/^https?:\/\/(x|twitter)\.com\//, '').replace(/^@/, '') : '';
+  const recent = (d && d.recent) || [];
+  const per = 5;
+  let page = 1;
+  main.innerHTML = '<div class="shead"><div class="ci"><img alt="" src="pfp.jpg" onerror="this.src=\'' + coinArt('stash', 'ST') + '\'"></div><div><h1>' + name + ' Coin <span>$' + tk + '</span></h1><div class="chips">' +
+    (ca ? '<button class="chip mono" id="caChip">' + short(ca, 4) + ' ' + I.copy + '</button>' : '<span class="chip">Contract address posts at launch</span>') +
+    (x ? '<a class="chip" href="https://x.com/' + esc(x) + '" target="_blank" rel="noopener">' + I.xlogo + ' x.com/' + esc(x) + '</a>' : '') +
+    '<a class="chip" href="#/">' + I.globe + ' ' + esc(siteHost()) + '</a></div></div></div>' +
+    '<p class="sdesc">Launch coins linked to real-life rewards, funded by trading fees and claimable by holders. 20% of every fee claim buys and burns $' + tk + '.</p>' +
+    '<section class="stats"><div class="card stat"><div class="hd"><div><div class="lbl">' + I.flame + 'Burned</div><div class="sub num">' + (d ? d.burnedPct.toFixed(2) : '0.00') + '% of the 1B supply</div></div></div><div class="val num">' + compact(d ? d.burnedTokens / 1e6 : 0) + ' $' + tk + '</div>' + spark(d ? d.series.map((p) => [p[0], p[1] / 1e6]) : []) + '</div>' +
+    '<div class="card stat" style="padding-bottom:12px"><div class="hd"><div class="lbl">Recent burns</div><div class="pager"><button class="iconbtn" id="rbp" aria-label="Previous page">' + I.left + '</button><span class="num" id="rbl">1 / 1</span><button class="iconbtn" id="rbn" aria-label="Next page">' + I.right + '</button></div></div><div class="burns" id="burns" style="margin-top:10px"></div></div>' +
+    '<div class="card stat"><div class="hd"><div><div class="lbl">' + I.card + 'Spent</div><div class="sub num">' + sol(d ? d.spentLamports : 0, 2) + '</div></div></div><div class="val num">' + usd(d ? d.spentUsd : 0) + '</div>' + spark([]) + '</div></section>' +
+    '<div class="card mkt" style="margin-top:14px"><div class="top2"><div><div class="lb">Market cap</div><div class="big num">' + (d && d.market && d.market.mcapUsd ? usd(d.market.mcapUsd) : '—') + '</div></div><div class="seg" id="tf"><button data-tf="5m">5M</button><button data-tf="1h" class="on">1H</button><button data-tf="6h">6H</button><button data-tf="1d">1D</button><button data-tf="all">ALL</button></div></div>' +
+    '<div class="kv"><span>Price <b class="num">' + price(d && d.market && d.market.priceUsd) + '</b></span><span>Liquidity <b class="num">' + (d && d.market && d.market.liquidityUsd ? usd(d.market.liquidityUsd) : '—') + '</b></span><span>Volume <b class="num">' + (d && d.market && d.market.volumeUsd ? usd(d.market.volumeUsd) : '—') + '</b></span></div>' +
+    '<div class="chart" id="chart"><div class="none">' + (ca ? 'Loading chart…' : 'The chart starts when $' + tk + ' is live.') + '</div></div>' +
+    '<div class="links">' + (ca ? '<a class="btn pri" href="' + esc(CFG.BUY || 'https://pump.fun/coin/' + ca) + '" target="_blank" rel="noopener">Buy $' + tk + ' ' + I.out + '</a><a class="btn" href="' + esc(CFG.CHART || 'https://gmgn.ai/sol/token/' + ca) + '" target="_blank" rel="noopener">Chart ' + I.out + '</a>' : '') + '</div></div>';
+  const cc = $('#caChip');
+  if (cc) cc.onclick = () => copyText(ca, 'Contract address copied');
+  const drawBurns = () => {
+    const pages = Math.max(1, Math.ceil(recent.length / per));
+    $('#rbl').textContent = page + ' / ' + pages;
+    $('#rbp').disabled = page <= 1; $('#rbn').disabled = page >= pages;
+    $('#burns').innerHTML = recent.length ? recent.slice((page - 1) * per, page * per).map((r) => '<div class="b"><b class="num">' + compact(r.tokens / 1e6) + '</b><span class="num muted">' + usd(r.usd) + '</span><span class="faint num" style="text-align:right">' + ago(r.at) + '</span><a class="mono faint" href="https://solscan.io/tx/' + esc(r.sig) + '" target="_blank" rel="noopener">' + short(r.sig || '', 4) + ' ' + I.out + '</a></div>').join('') : '<div class="faint" style="font-size:13px;padding:8px 0">No burns yet. The first one runs once the burn wallet holds 0.05 SOL' + (ca ? '' : ' and $' + tk + ' is live') + '.</div>';
+  };
+  $('#rbp').onclick = () => { page--; drawBurns(); };
+  $('#rbn').onclick = () => { page++; drawBurns(); };
+  drawBurns();
+  const loadChart = async (tf) => {
+    const box = $('#chart');
+    if (!box || !ca || !st.online) return;
+    try { const r = await api('/api/coins/' + ca + '/chart?tf=' + tf); box.innerHTML = r.candles.length > 1 ? candleChart(r.candles, box.clientWidth, box.clientHeight) : '<div class="none">No trades in this range yet.</div>'; } catch (e) { box.innerHTML = '<div class="none">Chart unavailable</div>'; }
+  };
+  $$('#tf button').forEach((bt) => (bt.onclick = () => { $$('#tf button').forEach((x2) => x2.classList.toggle('on', x2 === bt)); loadChart(bt.dataset.tf); }));
+  loadChart('1h');
+}
+
+/* ================================================================= docs */
+
+function viewDocs(id, dev, anchor) {
+  const isDev = dev === 'developers';
+  const c = st.config || {};
+  const W = c.wallets || {};
+  const tk = esc(CFG.TICKER || 'STASH');
+  const sections = isDev ? [['launch', 'Launch'], ['modes', 'Modes'], ['settlement', 'Settlement'], ['integration', 'Integration'], ['read-data', 'Read data']] : [['overview', 'Overview'], ['launch-modes', 'Launch modes'], ['balances', 'Balances and redeeming'], ['listing', 'Listing requirements']];
+  const code = (name, body) => '<pre class="code"><div class="fname"><span>' + esc(name) + '</span><button type="button" data-copycode>Copy</button></div><code>' + body + '</code></pre>';
+  const addr = (a, label) => a ? '<code>' + esc(a) + '</code>' : '<span class="faint">' + label + ' (shown once the server is running)</span>';
+  const using =
+    '<div class="eyebrow">Docs</div><h1>How ' + esc(CFG.NAME || 'Stash') + ' works</h1>' +
+    '<p class="lead">Launch a coin on pump.fun and link it to a brand. 80% of its trading fees fund rewards for holders. 20% buys and burns <span style="color:var(--accent)">$' + tk + '</span>. Holders redeem what they earn as that brand\'s gift card.</p>' +
+    '<h2 id="overview">Overview</h2><p class="sub">Where trading fees go.</p>' +
+    '<p>Trading a coin on pump.fun earns creator fees. Once enough has built up, they are claimed and split the same way every time.</p>' +
+    '<div class="card flow"><div class="fn"><small>Trades</small><b>The coin</b></div><div class="vl"></div><div class="fn"><small>Fees</small><b>Claimed</b></div>' +
+    '<div class="fsplit"><div><div class="fn acc"><small>20%</small><b>Buy &amp; burn $' + tk + '</b></div></div><div><div class="fn acc"><small>80%</small><b>Holders</b></div><div class="vl"></div><div class="fn"><small>Redeem</small><b>Gift card</b></div></div></div></div>' +
+    '<div class="tablewrap"><table class="kvt"><tr><td>Holders</td><td>80%, funds rewards for holders</td></tr><tr><td>Buy &amp; burn</td><td>20%, buys and burns $' + tk + '</td></tr><tr><td>Claimed</td><td>Once unclaimed fees reach ' + ((c.claimThresholdLamports || 1e8) / LAMPORTS) + ' SOL</td></tr><tr><td>Other fees</td><td>None</td></tr></table></div>' +
+    '<h2 id="launch-modes">Launch modes</h2><p class="sub">How holders get paid, and who qualifies.</p>' +
+    '<p>Create a coin, choose a brand, and launch on pump.fun. You pick how holders get paid, and how much they have to hold. Those choices are locked at launch.</p>' +
+    '<h3>Dividends</h3><p>Rewards are paid on every claim. Your share is your share of the tokens that qualify. No draw. Hold more, earn more.</p><p>Before each claim, holders are recorded, and the claim follows 2 to 5 minutes later. Your share counts the smaller of the two balances, so buying right before a payout doesn\'t count.</p>' +
+    '<h3>Giveaway</h3><p>Rewards build up for ' + (c.drawEveryMinutes || 10) + ' minutes. Eligible holders get tickets. Hold more, get more tickets and a better chance to win. You can win once per draw.</p>' +
+    '<p>Each prize is the cheapest US gift card for that brand, plus ' + ((c.prizeMarkupBps || 1000) / 100) + '%. A $550 pot and a $10 card means 50 winners, each with enough to redeem one card. If the pot is too small for one prize, it rolls into the next draw.</p>' +
+    '<div class="tablewrap"><table class="kvt"><tr><td>Who qualifies</td><td>Hold at least the minimum and you qualify. Hold less and you don\'t, in both modes.</td></tr><tr><td>Draw times</td><td>Giveaways draw at :00, :10, :20, :30, :40 and :50 past every hour, UTC.</td></tr><tr><td>Nobody qualifies</td><td>Dividends record the claim without paying anyone. Giveaways keep the fees and try again at the next draw.</td></tr></table></div>' +
+    '<h3>Minimum holding</h3><div class="tablewrap"><table class="kvt"><tr><th>Minimum</th><th>Share of supply</th></tr><tr><td>100K tokens</td><td>0.01%</td></tr><tr><td>1M tokens</td><td>0.1%</td></tr><tr><td>10M tokens</td><td>1%</td></tr></table></div>' +
+    '<p>You pick one at launch. It never changes. Supply is 1B tokens. Giveaways use whole tokens as tickets. Dividends use your token balance. The bonding curve and the pump.fun pool never count.</p>' +
+    '<h2 id="balances">Balances and redeeming</h2><p class="sub">Turning earned fees into a gift card.</p>' +
+    '<ul><li>Earnings are credited to a balance for each wallet and brand.</li><li>Coins linked to the same brand add to the same balance.</li><li>To redeem, choose a gift card amount on the brand page and sign with your wallet. The balance is debited and the gift card is issued.</li><li>If your region isn\'t listed, move the balance to any brand available in your region. If none are, cash it out as SOL.</li><li>There is a ' + ((c.cashoutPenaltyBps || 2000) / 100) + '% penalty on SOL cash-outs, so the gift card is the better deal. The penalty goes to buy &amp; burn.</li><li>If a gift card fails to issue or has an error, the spent amount is credited back.</li><li>Balances are held in SOL, so their dollar value moves with the SOL price until you redeem.</li></ul>' +
+    '<h2 id="listing">Listing requirements</h2><p class="sub">When a coin appears on ' + esc(CFG.NAME || 'Stash') + '.</p>' +
+    '<ul><li>It trades against SOL.</li><li>The linked brand is in the ' + esc(CFG.NAME || 'Stash') + ' list.</li><li>Its creator fees were locked at launch: 20% to the burn wallet and 80% to the holder vault, with pump.fun\'s fee-sharing admin revoked so the split can never change.</li></ul>';
+  const developers =
+    '<div class="eyebrow">Developers</div><h1>Build on ' + esc(CFG.NAME || 'Stash') + '</h1>' +
+    '<p class="lead">' + esc(CFG.NAME || 'Stash') + ' has no program of its own. A launch is plain pump.fun instructions: create the coin, opt it into pump.fun fee sharing, and lock two shareholders. A memo records the brand and payout. Holder credit and redemption happen off-chain.</p>' +
+    '<h2 id="launch">Launch</h2><p class="sub">Create a pump.fun coin and lock its fees to ' + esc(CFG.NAME || 'Stash') + '.</p>' +
+    '<p>Send these instructions, in this order. With the ' + esc(CFG.NAME || 'Stash') + ' lookup table they fit in one transaction; without it, send the create first and the lock right after.</p>' +
+    '<ol style="color:#d9d1c7;font-size:14.5px;line-height:1.7;padding-left:20px"><li><code>create_v2</code> on the pump program (SOL quote, mayhem off).</li><li>Optional dev buy: <code>buy_exact_quote_in_v2</code>, before the lock.</li><li><code>create_fee_sharing_config</code> on the pump fees program.</li><li><code>update_fee_shares_v2</code> with 2,000 bps to the burn wallet and 8,000 bps to the vault. pump.fun revokes the admin here, so the split is final.</li><li>A memo: <code>stash:1:&lt;brand&gt;:&lt;d|g&gt;:&lt;floor&gt;</code>.</li><li>A 0-lamport transfer to the vault, so the indexer sees the launch.</li></ol>' +
+    code('launch.js',
+      '<span class="cm">// sol.js ships with this site and has no dependencies.</span>\n' +
+      '<span class="kw">const</span> mint = <span class="kw">await</span> StashSol.generateKeypair();\n' +
+      '<span class="kw">const</span> plan = <span class="kw">await</span> StashSol.buildLaunch({\n' +
+      '  creator: wallet.address, mint: mint.address,\n' +
+      '  name: <span class="st">"My Coin"</span>, symbol: <span class="st">"MINE"</span>, uri: metadataUri,\n' +
+      '  brand: <span class="st">"steam"</span>, mode: <span class="st">"dividends"</span>, floor: 1,\n' +
+      '  devBuyLamports: 0n,\n' +
+      '  wallets: { burn: <span class="st">"' + esc(W.burn || 'BURN_WALLET') + '"</span>, vault: <span class="st">"' + esc(W.vault || 'VAULT_WALLET') + '"</span> },\n' +
+      '  recentBlockhash, lookupTable,\n' +
+      '});\n' +
+      '<span class="cm">// plan.txs: sign each (the mint also signs the create), send in order, wait for each.</span>') +
+    '<h2 id="modes">Modes</h2><p class="sub">The memo, and what each field means.</p>' +
+    '<div class="tablewrap"><table class="kvt"><tr><th>Field</th><th>Value</th></tr><tr><td>brand</td><td>A brand id from the list, for example <code>steam</code> or <code>uber-eats</code></td></tr><tr><td>mode <code>d</code></td><td>Dividends</td></tr><tr><td>mode <code>g</code></td><td>Giveaway</td></tr><tr><td>floor <code>0</code></td><td>100K tokens (0.01%)</td></tr><tr><td>floor <code>1</code></td><td>1M tokens (0.1%)</td></tr><tr><td>floor <code>2</code></td><td>10M tokens (1%)</td></tr></table></div>' +
+    '<p>The memo must be in the same transaction as <code>update_fee_shares_v2</code>, signed by the coin\'s creator. Tokens use 6 decimals, so 1 token is 1,000,000 raw units.</p>' +
+    '<h2 id="settlement">Settlement</h2><p class="sub">How each claim is split.</p>' +
+    '<h3>Dividends</h3><p>The holder share is what the distribution itself moved into the vault in the claim transaction. Anything else that lands in the vault is never credited. A wallet\'s balance is the smaller of its balance in the snapshot taken when fees crossed the threshold and its balance at payout. Each wallet gets <code>balance × lamports / total</code>, rounded down to whole lamports. Wallets are ordered by base58 address, and the remainder goes to the last wallet that receives at least one lamport. If nobody qualifies, the claim is recorded without credit.</p>' +
+    '<h3>Giveaway</h3><p>Claims wait in a pot. At each draw, the pot is split across as many qualifying wallets as it can fund, where each share covers the cheapest US gift card for the brand plus ' + ((c.prizeMarkupBps || 1000) / 100) + '%. A wallet\'s tickets are its whole-token balance, and a wallet wins at most once.</p>' +
+    '<p>The seed is the SHA-256 of the waiting claims\' signatures (sorted, joined with commas), a <code>|</code>, and the latest blockhash fetched after the draw boundary, read as a big-endian integer. No one can know it when they submit a claim. Seat <code>s</code> picks <code>(seed + s) mod tickets</code> by walking cumulative tickets over the remaining wallets in address order. Every draw\'s seed inputs are stored with it. If nobody qualifies, the price is missing, or the pot can\'t cover one card, the pot waits for the next draw.</p>' +
+    '<h2 id="integration">Integration</h2><p class="sub">Wallets, programs and the fee route.</p>' +
+    '<div class="tablewrap"><table class="kvt"><tr><td>Burn wallet (20%)</td><td>' + addr(W.burn, 'Burn wallet') + '</td></tr><tr><td>Holder vault (80%)</td><td>' + addr(W.vault, 'Vault') + '</td></tr><tr><td>pump</td><td><code>' + S.PROGRAMS.PUMP + '</code></td></tr><tr><td>pump fees</td><td><code>' + S.PROGRAMS.PUMP_FEES + '</code></td></tr><tr><td>pump AMM</td><td><code>' + S.PROGRAMS.PUMP_AMM + '</code></td></tr>' + (c.lookupTable ? '<tr><td>Lookup table</td><td><code>' + esc(c.lookupTable.key) + '</code></td></tr>' : '') + '</table></div>' +
+    '<ol style="color:#d9d1c7;font-size:14.5px;line-height:1.7;padding-left:20px"><li>Fees accrue in the creator vault <code>["creator-vault", sharing_config]</code> under pump, and for graduated coins in <code>["creator_vault", sharing_config]</code> under pump AMM.</li><li>Once ' + ((c.claimThresholdLamports || 1e8) / LAMPORTS) + ' SOL has built up, the worker sends <code>transfer_creator_fees_to_pump_v2</code> (graduated coins only) and <code>distribute_creator_fees_v2</code>. Both are permissionless.</li><li>Credit and redemption happen off-chain, from the vault\'s balance change in that transaction.</li></ol>' +
+    '<h2 id="read-data">Read data</h2><p class="sub">A small public JSON API.</p>' +
+    '<div class="tablewrap"><table class="kvt"><tr><td><code>GET /api/coins</code></td><td>Listed coins. <code>sort=top|new</code>, <code>brand</code>, <code>mode</code>, <code>page</code></td></tr><tr><td><code>GET /api/coins/:mint</code></td><td>One coin: market, distributed, claimed, vault, recipients</td></tr><tr><td><code>GET /api/brands</code></td><td>The brand list with coin counts and gift card availability</td></tr><tr><td><code>GET /api/wallet/:address</code></td><td>Balances per brand</td></tr><tr><td><code>GET /api/stats</code></td><td>Paid to holders, buy &amp; burn, redeemed. <code>range=1d|30d|all</code></td></tr><tr><td><code>POST /api/coins/register</code></td><td><code>{ "mint" }</code>: check and list a coin now instead of waiting for the indexer</td></tr></table></div>';
+
+  main.innerHTML = '<div class="docs"><aside class="dside"><div class="seg"><a href="#/docs" class="' + (isDev ? '' : 'on') + '">Using ' + esc(CFG.NAME || 'Stash') + '</a><a href="#/docs/developers" class="' + (isDev ? 'on' : '') + '">Developers</a></div>' +
+    '<div class="toc"><h6>On this page</h6>' + sections.map((s, i) => '<a href="#' + s[0] + '" data-to="' + s[0] + '" class="' + (i === 0 ? 'on' : '') + '">' + s[1] + '</a>').join('') + '</div></aside>' +
+    '<article class="doc">' + (isDev ? developers : using) + '</article></div>';
+  $$('.toc a').forEach((a) => (a.onclick = (e) => { e.preventDefault(); const t = document.getElementById(a.dataset.to); if (t) t.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }));
+  $$('[data-copycode]').forEach((b) => (b.onclick = () => copyText(b.closest('pre').querySelector('code').innerText, 'Code copied')));
+  if (anchor) { const t = document.getElementById(anchor); if (t) setTimeout(() => t.scrollIntoView(), 30); }
+  const heads = sections.map((s) => document.getElementById(s[0])).filter(Boolean);
+  const onScroll = () => {
+    if (!live(id)) return window.removeEventListener('scroll', onScroll);
+    let cur = heads[0];
+    for (const h of heads) if (h.getBoundingClientRect().top < 140) cur = h;
+    $$('.toc a').forEach((a) => a.classList.toggle('on', cur && a.dataset.to === cur.id));
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+}
+
+boot();
+})();
+</script>
+</body>
+</html>
